@@ -1,17 +1,36 @@
 #include <stdlib.h>
-#include "linked_list.c"
+#include <stdio.h>
+#include "globals.h"
 
-int main(int argc, char *argv[]){
-    struct Node l_list;
-    int i;
+#include "first_pass.c"
+#include "second_pass.c"
 
-    l_list = l_list_create(2, 1);
+void assemble_file(char* file_name)
+{
+    FILE *fp;
 
-    l_list_add(&l_list, 4, 2);
-    l_list_add(&l_list, 10, 3);
-    i = l_list_add(&l_list, 19, 4);
+	fp = fopen(file_name, "r");
+	if (fp == NULL)
+	{
+		printf("error while opening file");
+		exit(0);
+	}
 
-    l_list_print(&l_list);
+    first_pass(fp);
 
-    return 1;
+	fclose(fp);
+}
+
+int main(int argc, char* argv[])
+{
+	int i;
+	if (argc <= 1){
+		printf("no file passed");
+        exit(0);
+    }
+
+    for (i = 1; i < argc; i++)
+        assemble_file(argv[i]);
+
+	return 0;
 }
