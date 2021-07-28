@@ -27,7 +27,7 @@ void assemble_file(char* file_name)
 	}
 	else
 	{
-		first_pass(file_content, file_name); 
+		first_pass(file_content); 
 	}
 	fclose(file_content);
 }
