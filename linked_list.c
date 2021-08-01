@@ -4,34 +4,35 @@
 
 /* Linked list's node structure */
 struct Node{
+    int tags;
     int data;
     int key;
     struct Node *next;
 };
 
-struct Node l_list_create(int data, int key){
-    struct Node node;
+struct Node *node_create(int key, int data, int tags){
+    struct Node *node;
 
-    node.data = data;
-    node.key = key;
-    node.next = NULL;
+    node = (struct Node *) calloc(1, sizeof(struct Node));
+
+    node->data = data;
+    node->key = key;
+    node->tags = tags;
+    node->next = NULL;
 
     return node;
 }
 
 /* Add a value at the end of a linked list */
 /* Return the length of the list */
-int l_list_add(struct Node *l_list, int data, int key){
+int l_list_add(struct Node *l_list, struct Node *new_node){
     int i;
-    struct Node *new_node;
+    if (new_node == NULL || l_list == NULL)
+        return 0;
+
     struct Node *last_node;
 
-    new_node = (struct Node *) calloc(1, sizeof(struct Node));
     last_node = (struct Node *) calloc(1, sizeof(struct Node));
-
-    new_node->data = data;
-    new_node->key = key;
-    new_node->next = NULL;
 
     last_node = l_list;
 

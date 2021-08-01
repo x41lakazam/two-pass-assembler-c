@@ -1,36 +1,35 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "globals.h"
+#include "linked_list.h"
 
+#include "linked_list.c"
 #include "first_pass.c"
 #include "second_pass.c"
 
-void assemble_file(char* file_name)
-{
-    FILE *fp;
-
-	fp = fopen(file_name, "r");
-	if (fp == NULL)
-	{
-		printf("error while opening file");
-		exit(0);
-	}
-
-    first_pass(fp);
-
-	fclose(fp);
-}
+/* For now, compile with gcc main.c */
 
 int main(int argc, char* argv[])
 {
 	int i;
+    struct Node *external_labels_ptr;
 	if (argc <= 1){
 		printf("no file passed");
         exit(0);
     }
 
+
+    /* Create external labels table */
+    external_labels_ptr = node_create(-1, -1, -1);
+
+    /* Make first pass on every file */
     for (i = 1; i < argc; i++)
-        assemble_file(argv[i]);
+        first_pass(argv[i], external_labels_ptr);
+
+    /* Make second pass on every file */
+    /* for (i = 1; i < argc; i++) */
+    /*     second_pass(argv[i], external_labels_ptr); */
+
 
 	return 0;
 }
