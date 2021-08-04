@@ -12,7 +12,7 @@ void first_pass(char *fname, struct Node *external_labels_ptr){
 	struct Node *labels_table_ptr;
 
 	/* Init variables */
-	line = NULL;
+    line_ptr = (char *) calloc(LINE_MAX_SIZE, sizeof(char));
 	line_len = LINE_MAX_SIZE;
 
 	/* Open file */
@@ -27,7 +27,7 @@ void first_pass(char *fname, struct Node *external_labels_ptr){
 	/* Loop - Read lines and process them */
 	while ((read_cnt = getline(&line_ptr, &line_len, fp)) != -1) {
         printf("Retrieved line of length %zu:\n", read_cnt);
-        printf("%s", line);
+        printf(line_ptr);
     }
 
 
