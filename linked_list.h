@@ -1,7 +1,11 @@
+#ifndef LINKED_LIST_H
+#define LINKED_LIST_H
+
 /* Linked list's node structure */
 struct Node;
 
-/* int l_list_add(struct Node *, int, int); */
-/* struct Node l_list_create(int, int); */
+struct Node *node_create(int key, int data, int tags);
+int l_list_add(struct Node *l_list, struct Node *new_node);
+void l_list_print(struct Node *l_list);
 
-/* void l_list_print(struct Node *); */
+#endif

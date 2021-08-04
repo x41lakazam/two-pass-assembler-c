@@ -3,9 +3,10 @@
 #include "globals.h"
 #include "linked_list.h"
 
-#include "linked_list.c"
-#include "first_pass.c"
-#include "second_pass.c"
+#include "linked_list.h"
+#include "first_pass.h"
+#include "second_pass.h"
+#include "linked_list.h"
 
 /* For now, compile with gcc main.c */
 
