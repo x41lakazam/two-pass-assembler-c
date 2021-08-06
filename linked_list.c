@@ -2,7 +2,9 @@
 #include <stdio.h>
 #include "linked_list.h"
 
-/* Linked list's node structure */
+/*
+ * Linked list Node
+ */
 struct Node{
     int tags;
     int data;
@@ -10,6 +12,9 @@ struct Node{
     struct Node *next;
 };
 
+/*
+ * Initialize an empty node
+ */
 struct Node *node_create(int key, int data, int tags){
     struct Node *node;
 
@@ -23,8 +28,10 @@ struct Node *node_create(int key, int data, int tags){
     return node;
 }
 
-/* Add a value at the end of a linked list */
-/* Return the length of the list */
+/*
+ * Add a value at the end of a linked list
+ * Return the length of the list
+ */
 int l_list_add(struct Node *l_list, struct Node *new_node){
     int i;
     if (new_node == NULL || l_list == NULL)
@@ -48,6 +55,9 @@ int l_list_add(struct Node *l_list, struct Node *new_node){
     return i;
 }
 
+/*
+ * Print a linked list
+ */
 void l_list_print(struct Node *l_list){
     printf("{");
     while ( l_list->next != NULL ){

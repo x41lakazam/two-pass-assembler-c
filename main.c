@@ -19,10 +19,6 @@ int main(int argc, char* argv[])
         exit(0);
     }
 
-
-    /* Create external labels table */
-    external_labels_ptr = node_create(-1, -1, -1);
-
     /* Make first pass on every file */
     for (i = 1; i < argc; i++)
         first_pass(argv[i], external_labels_ptr);
@@ -30,7 +26,6 @@ int main(int argc, char* argv[])
     /* Make second pass on every file */
     /* for (i = 1; i < argc; i++) */
     /*     second_pass(argv[i], external_labels_ptr); */
-
 
 	return 0;
 }

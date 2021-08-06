@@ -92,21 +92,21 @@ void first_pass(char *fname){
         /* Handle labelled command */
         if (contain_label(line_ptr)){
             flags.has_label = 1;
-            label = get_label(line_ptr); /* TODO */
+            label = get_label(line_ptr); /* TODO - Maya */
         }
 
         /* Handle instruction (data storage) command */
         if (is_instruction(line_ptr)){
             flags.is_instruction = 1;
-            instruction = get_instruction(line_ptr);
+            instruction = get_instruction(line_ptr); /* TODO - Maya */
 
             /* If the line contains a label, add it to the labels table */
             if (flags.has_label){
-                label_data_instruction(labels_table, dc, label); /* TODO */
+                label_data_instruction(labels_table, dc, label); /* TODO - Eyal */
             }
 
             /* Update DC */
-            dc += get_required_cells(instruction);
+            dc += get_required_cells(instruction); /* TODO - Maya */
 
             /* Parse next line */
             continue;
@@ -114,23 +114,23 @@ void first_pass(char *fname){
 
 
         /* If it's a .entry instruction, stop first pass here */
-        if (is_entry_instruction(line_ptr)) /* TODO */
+        if (is_entry_instruction(line_ptr)) /* TODO - Maya */
             continue;
 
         /* Handle extern instruction */
-        if (is_extern_instruction(line_ptr)){
+        if (is_external_instruction(line_ptr)){ /* TODO - Maya */
 
             /* Extract the variable name from the line */
-            var_name = parse_external_var_name(line_ptr); /* TODO */
+            var_name = parse_external_var_name(line_ptr); /* TODO - Maya */
 
             /* Add this instruction as an external label */
-            add_external_variable(labels_table, var_name); /* TODO */
+            add_external_variable(labels_table, var_name); /* TODO - Eyal */
             continue;
         }
 
         /* If we get here, it's an code instruction */
         if (flags.has_label) /* If there is a label, add it */
-            label_code_instruction(labels_table, ic, label); /* TODO */
+            label_code_instruction(labels_table, ic, label); /* TODO - Eyal */
 
         ic += 4;
     }
@@ -138,7 +138,7 @@ void first_pass(char *fname){
     /* Because we want to put every data definition at the end
      * of the binary output file, add IC to every labelled data
      */
-    add_data_offset(labels_table, ic); /* TODO */
+    add_data_offset(labels_table, ic); /* TODO - Eyal */
 
 	/* Close the file */
 	fclose(fp);
