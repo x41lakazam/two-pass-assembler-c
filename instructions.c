@@ -5,6 +5,11 @@
 #include <stdbool.h>
 #include "utils.h"
 
+
+/*
+ * Instructions table
+ * Store every possible instruction
+ */
 char *instructions[] = {
     ".db",
     ".dh",
@@ -12,8 +17,14 @@ char *instructions[] = {
     ".asciz"
 };
 
+/*
+ * Store the number of available instructions
+ */
 int instructions_cnt = 4;
 
+/*
+ * Return True if a string is a valid instruction
+ */
 bool is_instruction(char *s){
     int i;
     /*
