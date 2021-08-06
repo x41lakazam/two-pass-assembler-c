@@ -9,13 +9,18 @@
 #include "linked_list.h"
 
 
+/*
+ * Boolean flags
+ */
 typedef struct Flags{
     unsigned int has_label : 1;
     unsigned int is_instruction : 1;
 } Flags;
 
 
-/* Module functions */
+/*
+ * Return True if a string contains a label
+ */
 bool contain_label(char *s){
     while (*s){
         if (*s++ == ':')
@@ -24,7 +29,9 @@ bool contain_label(char *s){
     return false;
 }
 
-/* Check that a line is relevant, meaning that it's not a comment/empty */
+/*
+ * Return True if a line is relevant, meaning it's not a comment or empty
+ */
 bool relevant_line(char *s){
 
     s = trim_whitespaces(s);
@@ -38,8 +45,11 @@ bool relevant_line(char *s){
     return true;
 }
 
+/*
+ * Perform first pass on a file
+ */
 void first_pass(char *fname, struct Node *external_labels_ptr){
-    Flags flags;
+    Flags flags; /*  */
     int ic, dc; /* Instruction counter, Data counter */
 	FILE *fp; /* File pointer */
 	char *line_ptr; /* Line holder */
@@ -49,7 +59,6 @@ void first_pass(char *fname, struct Node *external_labels_ptr){
 	struct Node *labels_table_ptr;
 
 	/* Init variables */
-    flags.has_label = 0;
     ic = 100;
     dc = 0;
     line_ptr = (char *) calloc(LINE_MAX_SIZE, sizeof(char));
@@ -66,6 +75,10 @@ void first_pass(char *fname, struct Node *external_labels_ptr){
 
 	/* Loop - Read lines and process them */
 	while ((read_cnt = getline(&line_ptr, &line_len, fp)) != -1) {
+        printf(line_ptr);
+
+        /* Reinitialize flags */
+        flags.has_label = flags.is_instruction = 0;
 
         /* Remove every leading whitespaces */
         line_ptr = trim_whitespaces(line_ptr);
@@ -74,19 +87,14 @@ void first_pass(char *fname, struct Node *external_labels_ptr){
         if (!relevant_line(line_ptr))
             continue;
 
-        printf(line_ptr);
+        /* Turn on the right flags */
         if (contain_label(line_ptr))
             flags.has_label = 1;
 
         if (is_instruction(line_ptr))
             flags.is_instruction = 1;
 
-
-
-
-
     }
-
 
 	/* Close the file */
 	fclose(fp);
