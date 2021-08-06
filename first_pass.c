@@ -48,13 +48,15 @@ bool relevant_line(char *s){
 /*
  * Perform first pass on a file
  */
-void first_pass(char *fname, struct Node *external_labels_ptr){
+void first_pass(char *fname){
+    /* TODO CREATE labels_table */
     Flags flags; /*  */
     int ic, dc; /* Instruction counter, Data counter */
 	FILE *fp; /* File pointer */
 	char *line_ptr; /* Line holder */
 	size_t line_len; /* Max Length of a line in a file */
 	ssize_t read_cnt; /* Number of character retrieved on a line */
+    char *label, *instruction, *var_name; /* Store temporary strings */
 
 	struct Node *labels_table_ptr;
 
@@ -87,14 +89,56 @@ void first_pass(char *fname, struct Node *external_labels_ptr){
         if (!relevant_line(line_ptr))
             continue;
 
-        /* Turn on the right flags */
-        if (contain_label(line_ptr))
+        /* Handle labelled command */
+        if (contain_label(line_ptr)){
             flags.has_label = 1;
+            label = get_label(line_ptr); /* TODO */
+        }
 
-        if (is_instruction(line_ptr))
+        /* Handle instruction (data storage) command */
+        if (is_instruction(line_ptr)){
             flags.is_instruction = 1;
+            instruction = get_instruction(line_ptr);
 
+            /* If the line contains a label, add it to the labels table */
+            if (flags.has_label){
+                label_data_instruction(labels_table, dc, label); /* TODO */
+            }
+
+            /* Update DC */
+            dc += get_required_cells(instruction);
+
+            /* Parse next line */
+            continue;
+        }
+
+
+        /* If it's a .entry instruction, stop first pass here */
+        if (is_entry_instruction(line_ptr)) /* TODO */
+            continue;
+
+        /* Handle extern instruction */
+        if (is_extern_instruction(line_ptr)){
+
+            /* Extract the variable name from the line */
+            var_name = parse_external_var_name(line_ptr); /* TODO */
+
+            /* Add this instruction as an external label */
+            add_external_variable(labels_table, var_name); /* TODO */
+            continue;
+        }
+
+        /* If we get here, it's an code instruction */
+        if (flags.has_label) /* If there is a label, add it */
+            label_code_instruction(labels_table, ic, label); /* TODO */
+
+        ic += 4;
     }
+
+    /* Because we want to put every data definition at the end
+     * of the binary output file, add IC to every labelled data
+     */
+    add_data_offset(labels_table, ic); /* TODO */
 
 	/* Close the file */
 	fclose(fp);
