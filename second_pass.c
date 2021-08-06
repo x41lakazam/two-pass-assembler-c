@@ -2,10 +2,50 @@
 #include <stdlib.h>
 
 #include "linked_list.h"
+#include "labels.h"
 
-void second_pass(char *fname, struct Node *external_labels_ptr){
+void second_pass(char *fname, LabelsTable labels_table){
 	FILE *fp;
+    char *line_ptr;
+
+    size_t line_len;
+    ssize_t read_cnt;
+
+    char *label;
+
+    MemoryMap map; /* TODO - Eyal */
+
 	fp = fopen(fname, "r");
+	/* Check if the file is valid */
+	if (!fp){
+		printf("Bad file: %s\n", fname);
+
+	while ((read_cnt = getline(&line_ptr, &line_len, fp)) != -1) {
+        /* remove every leading whitespaces */
+        line_ptr = trim_whitespaces(line_ptr);
+
+        /* Ignore every irrelevant line (comments/empty...) */
+        if (!relevant_line(line_ptr))
+            continue;
+
+        /* If it's an entry instruction - mark the symbol as entry */
+        if (is_entry_instruction(line_ptr)){
+            label = get_entry_label(line_ptr); /* TODO - Maya */
+            mark_label_as_entry(label_table, label); /* TODO - Eyal */
+            continue;
+        }
+
+        /* If it's a data instruction, add the data to the memory */
+        if (is_instruction(line_ptr)){
+            add_data_to_map(line_ptr, map); /* TODO - Big one */
+            continue;
+        }
+
+        /* === If we got here, then it's a code instruction === */
+
+        /* TODO - Skeleton */
+
+    }
 
 	fclose(fp);
 }
