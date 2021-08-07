@@ -2,6 +2,10 @@
 #define LABELS_H
 
 #include <stdbool.h>
+#include <string.h>
+
+#define LABEL_CHAR ":"
+
 
 typedef struct LabelsTable{
 
@@ -10,7 +14,7 @@ typedef struct LabelsTable{
 /*
  * Return the label in a line
  */
-char *get_label(char *);
+char *get_label(char *line);
 
 /*
  * Add a data instruction to a labels table

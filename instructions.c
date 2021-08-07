@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include "utils.h"
 
+#define MAX_CMD_LENGTH 80
 
 /*
  * Instructions table
@@ -40,3 +41,43 @@ bool is_instruction(char *s){
     }
     return false;
 }
+
+char *get_instruction(char *line_ptr){
+	char* find_instruction; 
+	char* name;
+	int i;
+	char* line_cpy =  (char *) calloc(MAX_CMD_LENGTH, sizeof(char));
+	strcpy(line_cpy, line_ptr); 
+	for (i=0; i < instructions_cnt; i++)
+	{
+		find_instruction = strstr(line_cpy, instructions[i]);
+		if (find_instruction)
+		{
+			name = strtok(find_instruction, " ");
+			return name;
+		}
+	}
+	return NULL; 
+}
+
+bool is_entry_instruction(char *line_ptr) {
+	char* entry = ".entry"; 
+	if (strstr(line_ptr, entry))
+	{
+		return true; 
+	}
+	return false; 
+}
+
+bool is_external_instruction(char *line_ptr) {
+	char* external = ".extern"; 
+	if (strstr(line_ptr, external))
+	{
+		return true; 
+	}
+	return false; 
+}
+
+
+
+
