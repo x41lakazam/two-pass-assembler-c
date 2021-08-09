@@ -78,6 +78,17 @@ bool is_external_instruction(char *line_ptr) {
 	return false; 
 }
 
+char *parse_external_var_name(char *line_ptr) {
+	/* i am assuming that the var name is always the second word in the line */
+
+	char* token;
+	char* line_cpy =  (char *) calloc(80, sizeof(char));
+	strcpy(line_cpy, line_ptr);
+	token = strtok(line_cpy, " ");  
+	token = strtok(NULL, " ");
+	return token; 
+}
+
 
 
 
