@@ -91,7 +91,7 @@ char *parse_external_var_name(char *line_ptr) {
 
 int get_required_cells(char *line_ptr) {
 	char* instruction_name = get_instruction(line_ptr);
-	char* token; 
+	char* token;  
 	int counter = 0; 
 
 	char* instruction_params = (char *) calloc(80, sizeof(char));
