@@ -89,6 +89,43 @@ char *parse_external_var_name(char *line_ptr) {
 	return token; 
 }
 
+int get_required_cells(char *line_ptr) {
+	char* instruction_name = get_instruction(line_ptr);
+	char* token; 
+	int counter = 0; 
+
+	char* instruction_params = (char *) calloc(80, sizeof(char));
+	strcpy(instruction_params, line_ptr + strlen(instruction_name)); 
+	instruction_params = trim_whitespaces(instruction_params);
+
+	if (strcmp(instruction_name, ".asciz") == 0) 
+	{
+		counter += strlen(instruction_params) + 1;
+	}
+	else 
+	{
+		token = strtok(instruction_params, ",");
+		while (token)
+		{
+			if (strcmp(instruction_name, ".db") == 0) 
+			{
+				counter += 1; 
+			}
+			else if (strcmp(instruction_name, ".dh") == 0) 
+			{
+				counter += 2; 
+			}
+			else if (strcmp(instruction_name, ".dw") == 0)
+			{
+				counter += 4; 
+			}
+			token = strtok(NULL, ","); 
+		}
+
+	}
+	return counter; 
+}
+
 
 
 

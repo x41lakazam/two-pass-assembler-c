@@ -32,6 +32,6 @@ char *parse_external_var_name(char *line_ptr);
  * Return the number of required memory cells
  * by an instruction line
  */
-int get_required_cells(char *instruction_name);
+int get_required_cells(char *line_ptr);
 
 #endif
