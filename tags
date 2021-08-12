@@ -1,0 +1,58 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_EXCMD	mixed	/number, pattern, mixed, or combineV2/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
+!_TAG_PROC_CWD	/home/x41/Documents/two-pass-assembler-c/	//
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	5.9.0	/p5.9.20210110.0/
+COMMENT_CHAR	globals.h	/^#define COMMENT_CHAR /;"	d
+FALSE	globals.h	/^#define FALSE /;"	d
+FIRST_PASS_H	first_pass.h	/^#define FIRST_PASS_H$/;"	d
+Flags	first_pass.c	/^typedef struct Flags{$/;"	s	file:
+Flags	first_pass.c	/^} Flags;$/;"	t	typeref:struct:Flags	file:
+GLOBALS_H	globals.h	/^#define GLOBALS_H$/;"	d
+INSTRUCTIONS_H	instructions.h	/^#define INSTRUCTIONS_H$/;"	d
+LABELS_H	labels.h	/^#define LABELS_H$/;"	d
+LABEL_CHAR	labels.h	/^#define LABEL_CHAR /;"	d
+LINE_MAX_SIZE	globals.h	/^#define LINE_MAX_SIZE /;"	d
+LINKED_LIST_H	linked_list.h	/^#define LINKED_LIST_H$/;"	d
+LabelsTable	labels.h	/^typedef struct LabelsTable{$/;"	s
+LabelsTable	labels.h	/^} LabelsTable;$/;"	t	typeref:struct:LabelsTable
+MAX_CMD_LENGTH	instructions.c	/^#define MAX_CMD_LENGTH /;"	d	file:
+Node	linked_list.c	/^struct Node{$/;"	s	file:
+SECOND_PASS_H	second_pass.h	/^#define SECOND_PASS_H$/;"	d
+TRUE	globals.h	/^#define TRUE /;"	d
+UTILS_H	utils.h	/^#define UTILS_H$/;"	d
+WHITESPACE	globals.h	/^#define WHITESPACE /;"	d
+contain_label	first_pass.c	/^bool contain_label(char *s){$/;"	f	typeref:typename:bool
+data	linked_list.c	/^    int data;$/;"	m	struct:Node	typeref:typename:int	file:
+external	globals.h	/^	external = 1$/;"	e	enum:label_tags
+first_pass	first_pass.c	/^void first_pass(char *fname){$/;"	f	typeref:typename:void
+get_instruction	instructions.c	/^char *get_instruction(char *line_ptr){$/;"	f	typeref:typename:char *
+get_label	labels.c	/^char *get_label(char *line) {$/;"	f	typeref:typename:char *
+get_required_cells	instructions.c	/^int get_required_cells(char *line_ptr) {$/;"	f	typeref:typename:int
+has_label	first_pass.c	/^    unsigned int has_label : 1;$/;"	m	struct:Flags	typeref:typename:unsigned int:1	file:
+instructions	instructions.c	/^char *instructions[] = {$/;"	v	typeref:typename:char * []
+instructions_cnt	instructions.c	/^int instructions_cnt = 4;$/;"	v	typeref:typename:int
+is_entry_instruction	instructions.c	/^bool is_entry_instruction(char *line_ptr) {$/;"	f	typeref:typename:bool
+is_external_instruction	instructions.c	/^bool is_external_instruction(char *line_ptr) {$/;"	f	typeref:typename:bool
+is_instruction	first_pass.c	/^    unsigned int is_instruction : 1;$/;"	m	struct:Flags	typeref:typename:unsigned int:1	file:
+is_instruction	instructions.c	/^bool is_instruction(char *s){$/;"	f	typeref:typename:bool
+key	linked_list.c	/^    int key;$/;"	m	struct:Node	typeref:typename:int	file:
+l_list_add	linked_list.c	/^int l_list_add(struct Node *l_list, struct Node *new_node){$/;"	f	typeref:typename:int
+l_list_print	linked_list.c	/^void l_list_print(struct Node *l_list){$/;"	f	typeref:typename:void
+label_tags	globals.h	/^typedef enum label_tags{$/;"	g
+label_tags	globals.h	/^} label_tags;$/;"	t	typeref:enum:label_tags
+main	main.c	/^int main(int argc, char* argv[])$/;"	f	typeref:typename:int
+next	linked_list.c	/^    struct Node *next;$/;"	m	struct:Node	typeref:struct:Node *	file:
+node_create	linked_list.c	/^struct Node *node_create(int key, int data, int tags){$/;"	f	typeref:struct:Node *
+parse_external_var_name	instructions.c	/^char *parse_external_var_name(char *line_ptr) {$/;"	f	typeref:typename:char *
+relevant_line	first_pass.c	/^bool relevant_line(char *s){$/;"	f	typeref:typename:bool
+second_pass	second_pass.c	/^void second_pass(char *fname, LabelsTable labels_table){$/;"	f	typeref:typename:void
+starts_with	utils.c	/^bool starts_with(char *s, char *t){$/;"	f	typeref:typename:bool
+tags	linked_list.c	/^    int tags;$/;"	m	struct:Node	typeref:typename:int	file:
+trim_whitespaces	utils.c	/^char *trim_whitespaces(char *s){$/;"	f	typeref:typename:char *

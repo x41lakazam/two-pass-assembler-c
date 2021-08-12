@@ -26,4 +26,11 @@ void label_data_instruction(LabelsTable *, int, char *);
  */
 void label_code_instruction(LabelsTable *, int, char *);
 
+/*
+ * Return the label wanted by the entry (TODO - Maya)
+ */
+char *get_entry_label(char *line_ptr);
+
+void mark_label_as_entry(LabelsTable *, char *);
+
 #endif

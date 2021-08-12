@@ -13,7 +13,6 @@
 int main(int argc, char* argv[])
 {
 	int i;
-    struct Node *external_labels_ptr;
 	if (argc <= 1){
 		printf("no file passed");
         exit(0);
@@ -21,7 +20,7 @@ int main(int argc, char* argv[])
 
     /* Make first pass on every file */
     for (i = 1; i < argc; i++)
-        first_pass(argv[i], external_labels_ptr);
+        first_pass(argv[i]);
 
     /* Make second pass on every file */
     /* for (i = 1; i < argc; i++) */

@@ -3,6 +3,7 @@
  */
 
 #include <stdbool.h>
+#include <stddef.h>
 #include "utils.h"
 
 #define MAX_CMD_LENGTH 80
@@ -43,11 +44,11 @@ bool is_instruction(char *s){
 }
 
 char *get_instruction(char *line_ptr){
-	char* find_instruction; 
+	char* find_instruction;
 	char* name;
 	int i;
 	char* line_cpy =  (char *) calloc(MAX_CMD_LENGTH, sizeof(char));
-	strcpy(line_cpy, line_ptr); 
+	strcpy(line_cpy, line_ptr);
 	for (i=0; i < instructions_cnt; i++)
 	{
 		find_instruction = strstr(line_cpy, instructions[i]);
@@ -57,25 +58,25 @@ char *get_instruction(char *line_ptr){
 			return name;
 		}
 	}
-	return NULL; 
+	return NULL;
 }
 
 bool is_entry_instruction(char *line_ptr) {
-	char* entry = ".entry"; 
+	char* entry = ".entry";
 	if (strstr(line_ptr, entry))
 	{
-		return true; 
+		return true;
 	}
-	return false; 
+	return false;
 }
 
 bool is_external_instruction(char *line_ptr) {
-	char* external = ".extern"; 
+	char* external = ".extern";
 	if (strstr(line_ptr, external))
 	{
-		return true; 
+		return true;
 	}
-	return false; 
+	return false;
 }
 
 char *parse_external_var_name(char *line_ptr) {
@@ -84,46 +85,46 @@ char *parse_external_var_name(char *line_ptr) {
 	char* token;
 	char* line_cpy =  (char *) calloc(80, sizeof(char));
 	strcpy(line_cpy, line_ptr);
-	token = strtok(line_cpy, " ");  
+	token = strtok(line_cpy, " ");
 	token = strtok(NULL, " ");
-	return token; 
+	return token;
 }
 
 int get_required_cells(char *line_ptr) {
 	char* instruction_name = get_instruction(line_ptr);
-	char* token;  
-	int counter = 0; 
+	char* token;
+	int counter = 0;
 
 	char* instruction_params = (char *) calloc(80, sizeof(char));
-	strcpy(instruction_params, line_ptr + strlen(instruction_name)); 
+	strcpy(instruction_params, line_ptr + strlen(instruction_name));
 	instruction_params = trim_whitespaces(instruction_params);
 
-	if (strcmp(instruction_name, ".asciz") == 0) 
+	if (strcmp(instruction_name, ".asciz") == 0)
 	{
 		counter += strlen(instruction_params) + 1;
 	}
-	else 
+	else
 	{
 		token = strtok(instruction_params, ",");
 		while (token)
 		{
-			if (strcmp(instruction_name, ".db") == 0) 
+			if (strcmp(instruction_name, ".db") == 0)
 			{
-				counter += 1; 
+				counter += 1;
 			}
-			else if (strcmp(instruction_name, ".dh") == 0) 
+			else if (strcmp(instruction_name, ".dh") == 0)
 			{
-				counter += 2; 
+				counter += 2;
 			}
 			else if (strcmp(instruction_name, ".dw") == 0)
 			{
-				counter += 4; 
+				counter += 4;
 			}
-			token = strtok(NULL, ","); 
+			token = strtok(NULL, ",");
 		}
 
 	}
-	return counter; 
+	return counter;
 }
 
 

@@ -51,14 +51,14 @@ bool relevant_line(char *s){
 void first_pass(char *fname){
     /* TODO CREATE labels_table */
     Flags flags; /*  */
-    int ic, dc; /* Instruction counter, Data counter */
+
 	FILE *fp; /* File pointer */
 	char *line_ptr; /* Line holder */
 	size_t line_len; /* Max Length of a line in a file */
 	ssize_t read_cnt; /* Number of character retrieved on a line */
-    char *label, *instruction, *var_name; /* Store temporary strings */
 
-	struct Node *labels_table_ptr;
+    int ic, dc; /* Instruction counter, Data counter */
+    char *label, *instruction, *var_name; /* Store temporary strings */
 
 	/* Init variables */
     ic = 100;
@@ -82,7 +82,7 @@ void first_pass(char *fname){
         /* Reinitialize flags */
         flags.has_label = flags.is_instruction = 0;
 
-        /* Remove every leading whitespaces */
+        /* remove every leading whitespaces */
         line_ptr = trim_whitespaces(line_ptr);
 
         /* Ignore every irrelevant line (comments/empty...) */
