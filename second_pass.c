@@ -25,6 +25,8 @@ void second_pass(char *fname, LabelsTable *labels_table_ptr, FILE *of){
 	/* Check if the file is valid */
 	if (!fp){
 		printf("Bad file: %s\n", fname);
+        return;
+    }
 
 	while ((read_cnt = getline(&line_ptr, &line_len, fp)) != -1) {
         /* remove every leading whitespaces */

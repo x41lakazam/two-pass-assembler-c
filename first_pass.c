@@ -1,4 +1,5 @@
 #include <stdio.h>
+
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
@@ -6,7 +7,7 @@
 #include "instructions.h"
 #include "utils.h"
 #include "globals.h"
-#include "linked_list.h"
+#include "labels.h"
 
 
 /*
@@ -60,11 +61,15 @@ void first_pass(char *fname){
     int ic, dc; /* Instruction counter, Data counter */
     char *label, *instruction, *var_name; /* Store temporary strings */
 
+	LabelsTable labels_table;
+
 	/* Init variables */
     ic = 100;
     dc = 0;
     line_ptr = (char *) calloc(LINE_MAX_SIZE, sizeof(char));
 	line_len = LINE_MAX_SIZE;
+
+	labels_table = (LabelsTable *) calloc(1, sizeof(LabelsTable));
 
 	/* Open file */
 	fp = fopen(fname, "r");
@@ -77,7 +82,6 @@ void first_pass(char *fname){
 
 	/* Loop - Read lines and process them */
 	while ((read_cnt = getline(&line_ptr, &line_len, fp)) != -1) {
-        printf(line_ptr);
 
         /* Reinitialize flags */
         flags.has_label = flags.is_instruction = 0;
@@ -92,45 +96,44 @@ void first_pass(char *fname){
         /* Handle labelled command */
         if (contain_label(line_ptr)){
             flags.has_label = 1;
-            label = get_label(line_ptr); /* TODO - Maya */
+            label = get_label(line_ptr);
         }
 
         /* Handle instruction (data storage) command */
         if (is_instruction(line_ptr)){
             flags.is_instruction = 1;
-            instruction = get_instruction(line_ptr); /* TODO - Maya */
+            instruction = get_instruction(line_ptr);
 
             /* If the line contains a label, add it to the labels table */
             if (flags.has_label){
-                label_data_instruction(labels_table, dc, label); /* TODO - Eyal */
+                label_data_instruction(labels_table, dc, label);
             }
 
             /* Update DC */
-            dc += get_required_cells(instruction); /* TODO - Maya */
+            dc += get_required_cells(instruction);
 
             /* Parse next line */
             continue;
         }
 
-
         /* If it's a .entry instruction, stop first pass here */
-        if (is_entry_instruction(line_ptr)) /* TODO - Maya */
+        if (is_entry_instruction(line_ptr))
             continue;
 
         /* Handle extern instruction */
-        if (is_external_instruction(line_ptr)){ /* TODO - Maya */
+        if (is_external_instruction(line_ptr)){
 
             /* Extract the variable name from the line */
-            var_name = parse_external_var_name(line_ptr); /* TODO - Maya */
+            var_name = parse_external_var_name(line_ptr);
 
             /* Add this instruction as an external label */
-            add_external_variable(labels_table, var_name); /* TODO - Eyal */
+            add_external_variable(labels_table, var_name);
             continue;
         }
 
         /* If we get here, it's an code instruction */
         if (flags.has_label) /* If there is a label, add it */
-            label_code_instruction(labels_table, ic, label); /* TODO - Eyal */
+            label_code_instruction(labels_table, ic, label);
 
         ic += 4;
     }
@@ -138,7 +141,7 @@ void first_pass(char *fname){
     /* Because we want to put every data definition at the end
      * of the binary output file, add IC to every labelled data
      */
-    add_data_offset(labels_table, ic); /* TODO - Eyal */
+    add_data_offset(labels_table, ic);
 
 	/* Close the file */
 	fclose(fp);
