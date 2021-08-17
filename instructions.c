@@ -113,7 +113,7 @@ int get_required_cells(char *line_ptr) {
 		token = strtok(instruction_params, ",");
 		while (token)
 		{
-			if (strcmp(instruction_name, ".db") == 0)
+			counter += 1;
 			token = strtok(NULL, ",");
 		}
 
