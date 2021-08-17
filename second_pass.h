@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-void second_pass(char *fname, struct Node *external_labels_ptr, FILE *of);
+void second_pass(char *fname, struct Node *external_labels_ptr, FILE *of, int dc_offset);
 
 
 

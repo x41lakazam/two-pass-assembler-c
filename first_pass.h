@@ -4,6 +4,6 @@
 #include <stdbool.h>
 
 bool contain_label(char *);
-void first_pass(char *fname);
+void first_pass(char *fname, char *of);
 
 #endif

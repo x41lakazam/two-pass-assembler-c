@@ -13,6 +13,7 @@
 int main(int argc, char* argv[])
 {
 	int i;
+	char *of = "a.out"; /* TODO */
 	if (argc <= 1){
 		printf("no file passed");
         exit(0);
@@ -20,7 +21,7 @@ int main(int argc, char* argv[])
 
     /* Make first pass on every file */
     for (i = 1; i < argc; i++)
-        first_pass(argv[i]);
+        first_pass(argv[i], of);
 
     /* Make second pass on every file */
     /* for (i = 1; i < argc; i++) */

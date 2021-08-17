@@ -10,7 +10,7 @@ void add_data_to_map(char *line_ptr, MemoryMap *map_ptr){
     return;
 }
 
-void second_pass(char *fname, LabelsTable *labels_table_ptr, FILE *of){
+void second_pass(char *fname, LabelsTable *labels_table_ptr, char *of, int dc_offset){
 	FILE *fp;
     char *line_ptr;
 
@@ -19,9 +19,14 @@ void second_pass(char *fname, LabelsTable *labels_table_ptr, FILE *of){
 
     char *label;
 
-    BITMAP_32 *bitmap;
+    char *tmp_file; /* Temporary file to store data lines */
 
-    MemoryMap *data_map_ptr; /* TODO - Eyal */
+    int ic, dc;
+
+    ic = 100;
+    dc = 100 + dc_offset;
+
+    BITMAP_32 *bitmap;
 
 	fp = fopen(fname, "r");
 	/* Check if the file is valid */
@@ -41,24 +46,30 @@ void second_pass(char *fname, LabelsTable *labels_table_ptr, FILE *of){
         /* If it's an entry instruction - mark the symbol as entry */
         if (is_entry_instruction(line_ptr)){
             label = get_entry_label(line_ptr); /* TODO - Maya */
-            mark_label_as_entry(labels_table_ptr, label); /* TODO - Eyal */
+            mark_label_as_entry(labels_table_ptr, label);
             continue;
         }
 
         /* If it's a data instruction, add the data to the memory */
         if (is_instruction(line_ptr)){
-            add_data_to_map(line_ptr, data_map_ptr); /* TODO - Big one */
+            tmp_dump_data_instruction(line_ptr, dc); /* TODO - Big one */
+            dc += get_required_cells(line_ptr);
             continue;
         }
 
         /* === If we got here, then it's a code instruction === */
 
         /* Encode the line to binary */
-        bitmap = encode_instruction_line(line_ptr, labels_table_ptr, data_map_ptr); /* TODO - Bit one */
+        bitmap = encode_instruction_line(line_ptr, labels_table_ptr); /* TODO - Bit one */
+
+        ic += 4;
 
         /* Add the bitmap to the file */
-        dump_bitmap(bitmap, of); /* TODO - Maya */
+        dump_bitmap(bitmap, of, ic); /* TODO - Maya */
     }
+
+    /* Merge the temporary file to the output file */
+    merge_tmp_data_file();
 
 	fclose(fp);
 }

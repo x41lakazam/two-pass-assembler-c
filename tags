@@ -45,9 +45,9 @@ add_label_to_table	labels.c	/^void add_label_to_table(LabelsTable *tbl_ptr, Labe
 contain_label	first_pass.c	/^bool contain_label(char *s){$/;"	f	typeref:typename:bool
 create_label	labels.c	/^Label *create_label(LabelsTable *tbl_ptr, int addr, char *name, int is_code, int is_entry, int i/;"	f	typeref:typename:Label *
 data	linked_list.c	/^    int data;$/;"	m	struct:Node	typeref:typename:int	file:
-dump_bitmap	encoder.c	/^void dump_bitmap(BITMAP_32 *bitmap, FILE *f) {$/;"	f	typeref:typename:void
+dump_bitmap	encoder.c	/^void dump_bitmap(BITMAP_32 *bitmap, char *fname, int line_no) {$/;"	f	typeref:typename:void
 external	globals.h	/^	external = 1$/;"	e	enum:label_tags
-first_pass	first_pass.c	/^void first_pass(char *fname){$/;"	f	typeref:typename:void
+first_pass	first_pass.c	/^void first_pass(char *fname, char *of){$/;"	f	typeref:typename:void
 get_instruction	instructions.c	/^char *get_instruction(char *line_ptr){$/;"	f	typeref:typename:char *
 get_label	labels.c	/^char *get_label(char *line) {$/;"	f	typeref:typename:char *
 get_label_by_name	labels.c	/^Label *get_label_by_name(LabelsTable *tbl_ptr, char *name){$/;"	f	typeref:typename:Label *
@@ -78,7 +78,7 @@ next	linked_list.c	/^    struct Node *next;$/;"	m	struct:Node	typeref:struct:Nod
 node_create	linked_list.c	/^struct Node *node_create(int key, int data, int tags){$/;"	f	typeref:struct:Node *
 parse_external_var_name	instructions.c	/^char *parse_external_var_name(char *line_ptr) {$/;"	f	typeref:typename:char *
 relevant_line	instructions.c	/^bool relevant_line(char *s){$/;"	f	typeref:typename:bool
-second_pass	second_pass.c	/^void second_pass(char *fname, LabelsTable *labels_table_ptr, FILE *of){$/;"	f	typeref:typename:void
+second_pass	second_pass.c	/^void second_pass(char *fname, LabelsTable *labels_table_ptr, char *of, int dc_offset){$/;"	f	typeref:typename:void
 starts_with	utils.c	/^bool starts_with(char *s, char *t){$/;"	f	typeref:typename:bool
 tags	linked_list.c	/^    int tags;$/;"	m	struct:Node	typeref:typename:int	file:
 trim_label	labels.c	/^char *trim_label(char *line){$/;"	f	typeref:typename:char *

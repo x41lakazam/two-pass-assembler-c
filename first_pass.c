@@ -34,7 +34,7 @@ bool contain_label(char *s){
 /*
  * Perform first pass on a file
  */
-void first_pass(char *fname){
+void first_pass(char *fname, char *of){
     /* TODO CREATE labels_table */
     Flags flags; /*  */
 
@@ -131,4 +131,7 @@ void first_pass(char *fname){
 
 	/* Close the file */
 	fclose(fp);
+
+    /* Start second pass */
+    second_pass(fname, labels_table, of, ic);
 }

@@ -2,7 +2,6 @@
 #include "encoder.h"
 
 void dump_bitmap(BITMAP_32 *bitmap, char *fname, int line_no) {
-/* assuming that f is already open */
 	int i;
 	unsigned int j;
     FILE *fp;
@@ -18,6 +17,10 @@ void dump_bitmap(BITMAP_32 *bitmap, char *fname, int line_no) {
 
     fclose(fp);
 	}
+}
+
+BITMAP_32 *encode_instruction_line(char *line_ptr, LabelsTable *labels_table_ptr){
+
 }
 
 
