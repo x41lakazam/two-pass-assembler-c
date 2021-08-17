@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "instructions.h"
 #include "labels.h"
 #include "encoder.h"
+#include "utils.h"
 
 void add_data_to_map(char *line_ptr, MemoryMap *map_ptr){
     return;

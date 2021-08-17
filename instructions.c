@@ -4,7 +4,11 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 #include "utils.h"
+#include "globals.h"
 
 #define MAX_CMD_LENGTH 80
 
@@ -101,6 +105,7 @@ int get_required_cells(char *line_ptr) {
 
 	if (strcmp(instruction_name, ".asciz") == 0)
 	{
+        /* Warning: strlen also count double quotes and ending whitespaces */
 		counter += strlen(instruction_params) + 1;
 	}
 	else
@@ -108,6 +113,7 @@ int get_required_cells(char *line_ptr) {
 		token = strtok(instruction_params, ",");
 		while (token)
 		{
+            /* Warning: Every instruction should add 1 to counter */
 			if (strcmp(instruction_name, ".db") == 0)
 			{
 				counter += 1;
@@ -127,6 +133,21 @@ int get_required_cells(char *line_ptr) {
 	return counter;
 }
 
+/*
+ * Return True if a line is relevant, meaning it's not a comment or empty
+ */
+bool relevant_line(char *s){
+
+    s = trim_whitespaces(s);
+
+    if (*s == '\n')
+        return false;
+
+    if (*s == COMMENT_CHAR)
+        return false;
+
+    return true;
+}
 
 
 

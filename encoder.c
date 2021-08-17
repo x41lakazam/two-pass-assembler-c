@@ -10,7 +10,7 @@ void dump_bitmap(BITMAP_32 *bitmap, FILE *f) {
 	{
 		for (j = 1 << 8; j > 0; j = j / 2)
 		{
-			(bitmap[i] & j) ? fprintf(f, "1") : fprintf(f, "0");
+			(*bitmap[i] & j) ? fprintf(f, "1") : fprintf(f, "0");
 		}
 		fprintf(f, "\n");
 	}

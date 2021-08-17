@@ -1,13 +1,20 @@
 #include "globals.h"
 #include "labels.h"
+#include "utils.h"
 #include <stdlib.h>
 
 char *get_label(char *line) {
 	char* label;
  	char* line_cpy = (char *) calloc(LINE_MAX_SIZE, sizeof(char));
 	strcpy(line_cpy, line);
-	label = strtok(line_cpy, LABEL_CHAR);
+	label = strtok(line_cpy, ":");
 	return label;
+}
+
+char *trim_label(char *line){
+	while (*line++ != LABEL_CHAR) {}
+	line = trim_whitespaces(line);
+	return line;
 }
 
 void add_label_to_table(LabelsTable *tbl_ptr, Label *label){
@@ -77,15 +84,19 @@ void mark_label_as_entry(LabelsTable *tbl, char *name){
 Label *create_label(LabelsTable *tbl_ptr, int addr, char *name, int is_code, int is_entry, int is_external){
     Label *label;
 
+    /* Create a label */
 	label = (Label *) calloc(1, sizeof(Label));
-	label->value = 0;
-	label->is_code = 0;
-	label->is_entry = 0;
-	label->is_external = 0;
+
+    /* Set members values */
+	label->value = addr;
+	label->is_code = is_code;
+	label->is_entry = is_entry;
+	label->is_external = is_external;
 
     if (name)
 	    strcpy(label->label, name);
 
+    /* Add this label to the labels table */
     add_label_to_table(tbl_ptr, label);
 
     return label;

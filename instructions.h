@@ -1,7 +1,7 @@
 #ifndef INSTRUCTIONS_H
 #define INSTRUCTIONS_H
 
-
+#include <stdbool.h>
 
 /*
  * Return True if a line is an instruction
@@ -33,5 +33,11 @@ char *parse_external_var_name(char *line_ptr);
  * by an instruction line
  */
 int get_required_cells(char *line_ptr);
+
+/*
+ * Return False if a line is irrelevant
+ * (empty or commented out)
+ */
+bool relevant_line(char *s);
 
 #endif

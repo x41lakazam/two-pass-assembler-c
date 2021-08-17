@@ -1,6 +1,8 @@
 #ifndef ENCODER_H
 #define ENCODER_H
+#include <stdio.h>
 #include "labels.h"
+
 
 #define SetBit(A,k)     ( A[(k/32)] |= (1 << (k%32)) )
 #define ClearBit(A,k)   ( A[(k/32)] &= ~(1 << (k%32)) )
@@ -14,7 +16,7 @@ typedef struct MemoryMap{
 /*
  * Translate a line instruction into bit maps
  */
-BITMAP_32 *encode_instrution_line(char *line_ptr, LabelsTable *, MemoryMap *);
+BITMAP_32 *encode_instruction_line(char *line_ptr, LabelsTable *, MemoryMap *);
 
 /*
  * Add data entry to the memory map

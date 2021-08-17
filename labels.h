@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-#define LABEL_CHAR ":"
+#define LABEL_CHAR ':'
 
 typedef struct Label{
 	char label[80]; /* Name of the label */
@@ -23,6 +23,11 @@ typedef struct LabelsTable{
  * Return the label in a line
  */
 char *get_label(char *line);
+
+/*
+ * Return the line from after the label
+ */
+char *trim_label(char *line);
 
 /*
  * Add a data instruction to a labels table
@@ -54,6 +59,9 @@ Label *get_label_by_name(LabelsTable *tbl_ptr, char *name);
 
 void add_external_variable(LabelsTable *tbl_ptr, char *name);
 
+/*
+ * Create a label and add it to the table
+ */
 Label *create_label(LabelsTable *tbl_ptr, int addr, char *name, int is_code, int is_entry, int is_external);
 
 void add_external_variable(LabelsTable *tbl_ptr, char *label_name);

@@ -30,21 +30,6 @@ bool contain_label(char *s){
     return false;
 }
 
-/*
- * Return True if a line is relevant, meaning it's not a comment or empty
- */
-bool relevant_line(char *s){
-
-    s = trim_whitespaces(s);
-
-    if (*s == '\n')
-        return false;
-
-    if (*s == COMMENT_CHAR)
-        return false;
-
-    return true;
-}
 
 /*
  * Perform first pass on a file
@@ -61,7 +46,7 @@ void first_pass(char *fname){
     int ic, dc; /* Instruction counter, Data counter */
     char *label, *instruction, *var_name; /* Store temporary strings */
 
-	LabelsTable labels_table;
+	LabelsTable *labels_table;
 
 	/* Init variables */
     ic = 100;
@@ -97,6 +82,7 @@ void first_pass(char *fname){
         if (contain_label(line_ptr)){
             flags.has_label = 1;
             label = get_label(line_ptr);
+            line_ptr = trim_label(line_ptr);
         }
 
         /* Handle instruction (data storage) command */
@@ -110,7 +96,7 @@ void first_pass(char *fname){
             }
 
             /* Update DC */
-            dc += get_required_cells(instruction);
+            dc += get_required_cells(line_ptr);
 
             /* Parse next line */
             continue;
