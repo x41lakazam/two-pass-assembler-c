@@ -113,19 +113,7 @@ int get_required_cells(char *line_ptr) {
 		token = strtok(instruction_params, ",");
 		while (token)
 		{
-            /* Warning: Every instruction should add 1 to counter */
 			if (strcmp(instruction_name, ".db") == 0)
-			{
-				counter += 1;
-			}
-			else if (strcmp(instruction_name, ".dh") == 0)
-			{
-				counter += 2;
-			}
-			else if (strcmp(instruction_name, ".dw") == 0)
-			{
-				counter += 4;
-			}
 			token = strtok(NULL, ",");
 		}
 
