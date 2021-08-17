@@ -77,9 +77,10 @@ next	labels.h	/^	struct LabelsTable *next;$/;"	m	struct:LabelsTable	typeref:stru
 next	linked_list.c	/^    struct Node *next;$/;"	m	struct:Node	typeref:struct:Node *	file:
 node_create	linked_list.c	/^struct Node *node_create(int key, int data, int tags){$/;"	f	typeref:struct:Node *
 parse_external_var_name	instructions.c	/^char *parse_external_var_name(char *line_ptr) {$/;"	f	typeref:typename:char *
-relevant_line	first_pass.c	/^bool relevant_line(char *s){$/;"	f	typeref:typename:bool
+relevant_line	instructions.c	/^bool relevant_line(char *s){$/;"	f	typeref:typename:bool
 second_pass	second_pass.c	/^void second_pass(char *fname, LabelsTable *labels_table_ptr, FILE *of){$/;"	f	typeref:typename:void
 starts_with	utils.c	/^bool starts_with(char *s, char *t){$/;"	f	typeref:typename:bool
 tags	linked_list.c	/^    int tags;$/;"	m	struct:Node	typeref:typename:int	file:
+trim_label	labels.c	/^char *trim_label(char *line){$/;"	f	typeref:typename:char *
 trim_whitespaces	utils.c	/^char *trim_whitespaces(char *s){$/;"	f	typeref:typename:char *
 value	labels.h	/^	int value; \/* Address of the label *\/$/;"	m	struct:Label	typeref:typename:int
