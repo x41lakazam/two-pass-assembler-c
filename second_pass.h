@@ -2,9 +2,7 @@
 #define SECOND_PASS_H
 
 #include <stdio.h>
+#include "labels.h"
 
-void second_pass(char *fname, struct Node *external_labels_ptr, FILE *of, int dc_offset);
-
-
-
+void second_pass(char *fname, LabelsTable *labels_table_ptr, char *of, int dc_offset);
 #endif

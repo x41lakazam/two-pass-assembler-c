@@ -11,6 +11,11 @@ char *get_label(char *line) {
 	return label;
 }
 
+char *get_entry_label(char *line_ptr){
+	/* TODO: Return second word */
+	return "DEBUG";
+}
+
 char *trim_label(char *line){
 	while (*line++ != LABEL_CHAR) {}
 	line = trim_whitespaces(line);

@@ -18,43 +18,6 @@ typedef enum {
 	R
 } InstructionsGroup;
 
-char R_cmds[][5] = {
-	"add",
-	"sub",
-	"and",
-	"or",
-	"nor",
-	"move",
-	"mvhi",
-	"mvlo"
-};
-
-char I_cmds[][5] = {
-	"addi",
-	"subi",
-	"andi",
-	"ori",
-	"nori",
-	"bne",
-	"beq",
-	"blt",
-	"bgt",
-	"lb",
-	"sb",
-	"lw",
-	"sw",
-	"lh",
-	"sh"
-};
-
-char J_cmds[][5] = {
-	"jmp",
-	"la",
-	"call",
-	"stop"
-};
-
-
 /*
  * Translate a line instruction into bit maps
  */
@@ -77,5 +40,11 @@ BITMAP_32 *build_J_instruction(int opcode, int is_reg, int addr);
 int translate_label(char *lbl_name, LabelsTable *labels_tbl_ptr, int frame_addr);
 
 InstructionsGroup get_instruction_group(char *cmd);
+
 int get_opcode(char *cmd);
+
+void tmp_dump_data_instruction(char *line_ptr, int addr);
+
+void merge_tmp_data_file();
+
 #endif

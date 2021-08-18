@@ -8,6 +8,7 @@
 #include "utils.h"
 #include "globals.h"
 #include "labels.h"
+#include "second_pass.h"
 
 
 /*

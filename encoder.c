@@ -1,6 +1,46 @@
 #include <stdio.h>
 #include "encoder.h"
 #include "labels.h"
+#include "globals.h"
+
+int R_cmds_len = 8;
+char R_cmds[8][5] = {
+	"add",
+	"sub",
+	"and",
+	"or",
+	"nor",
+	"move",
+	"mvhi",
+	"mvlo"
+};
+
+int I_cmds_len = 15;
+char I_cmds[15][5] = {
+	"addi",
+	"subi",
+	"andi",
+	"ori",
+	"nori",
+	"bne",
+	"beq",
+	"blt",
+	"bgt",
+	"lb",
+	"sb",
+	"lw",
+	"sw",
+	"lh",
+	"sh"
+};
+
+int J_cmds_len = 4;
+char J_cmds[4][5] = {
+	"jmp",
+	"la",
+	"call",
+	"stop"
+};
 
 void dump_bitmap(BITMAP_32 *bitmap, char *fname, int line_no) {
 	int i;
@@ -20,6 +60,14 @@ void dump_bitmap(BITMAP_32 *bitmap, char *fname, int line_no) {
 	}
 }
 
+void tmp_dump_data_instruction(char *line_ptr, int addr){
+	/* TODO */
+}
+
+void merge_tmp_data_file(){
+	/* TODO */
+}
+
 void get_cmd_name(char *line_ptr, char *buf){
     int i = 0;
 
@@ -28,8 +76,23 @@ void get_cmd_name(char *line_ptr, char *buf){
 }
 
 InstructionsGroup get_instruction_group(char *cmd_name){
-    /* TODO */
-    return R; /* Debug */
+    /* Assuming cmd_name is a valid command name */
+    int i;
+
+    /* Instruction is in R group ? */
+    for (i=0; i<R_cmds_len; i++)
+        if (STREQ(R_cmds[i], cmd_name)) return R;
+
+    /* Instruction is in I group ? */
+    for (i=0; i<I_cmds_len; i++)
+        if (STREQ(I_cmds[i], cmd_name)) return I;
+
+    /* Else instruction is in J group */
+    return J;
+}
+
+int get_opcode(char *cmd_name){
+	return 0; /* TODO */
 }
 
 int translate_label(char *lbl_name, LabelsTable *labels_tbl_ptr, int frame_addr){
@@ -58,7 +121,7 @@ BITMAP_32 *encode_instruction_line(char *line_ptr, LabelsTable *labels_table_ptr
 
     get_cmd_name(line_ptr, cmd_name);
     opcode = get_opcode(cmd_name);
-    instr_grp = get_instruction_group(cmd_name); /* TODO */
+    instr_grp = get_instruction_group(cmd_name);
 
     switch (instr_grp){
         /* TODO:

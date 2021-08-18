@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "encoder.h"
+#include "second_pass.h"
 #include "instructions.h"
 #include "labels.h"
-#include "encoder.h"
 #include "utils.h"
 
 void second_pass(char *fname, LabelsTable *labels_table_ptr, char *of, int dc_offset){
