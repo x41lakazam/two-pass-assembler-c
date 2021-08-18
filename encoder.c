@@ -146,23 +146,36 @@ BITMAP_32 *encode_instruction_line(char *line_ptr, LabelsTable *labels_table_ptr
 			rs = 0; 
 			break; 
 		}
-		rs = atoi(token) + 1; 
+		rs = atoi(token+1); 
 
 		token = strtok(NULL, ",");
-		if (!(token))
+		if (token)
 		{
-			immed = 0; 
-			break; 
-		}
-		immed = atoi(token); 
+			if (strchr(token, '$')) 
+			{
+				rt = atoi(token + 1); 
+				
+				token = strtok(NULL, ",");
+				if (token != NULL)
+				{
+					immed = translate_label(token, labels_table_ptr, frame_no);
+					break;
+				}
+				immed = 0; /* no label*/ 	
+			}
+			else 
+			{
+				immed = atoi(token); /* immed is a constans number */
 
-		token = strtok(NULL, ",");
-		if (!(token + 1))
-		{
-			rt = 0; 
-			break; 
+				token = strtok(NULL, ","); /* get third param */ 
+				if (!(token + 1))
+				{
+					rt = 0; 
+					break; 
+				}
+				rt = atoi(token+1); 
+			}
 		}
-		rt = atoi(token) + 1; 
 	        bitmap = build_I_instruction(opcode, rs, rt, immed); 
 	        break;
 	case R:
