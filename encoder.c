@@ -110,39 +110,103 @@ int translate_label(char *lbl_name, LabelsTable *labels_tbl_ptr, int frame_addr)
 }
 
 BITMAP_32 *encode_instruction_line(char *line_ptr, LabelsTable *labels_table_ptr, int frame_no){
-    BITMAP_32 *bitmap;
-    InstructionsGroup instr_grp;
-    char cmd_name[5];
+	BITMAP_32 *bitmap;
+	InstructionsGroup instr_grp;
+	char cmd_name[5];
 
-    int opcode;
-    int rs,rt,rd; /* Hold registers numbers */
-    int immed, addr, funct_no; /* Integer buffers specific to each group*/
-    int is_reg; /* register flag for J group */
+	int opcode;
+	int rs,rt,rd; /* Hold registers numbers */
+	int immed, addr, funct_no; /* Integer buffers specific to each group*/
+	int is_reg = 0; /* register flag for J group */
+	char* token;
+	char* params; /* the cmd line without the cmd itself */
 
-    get_cmd_name(line_ptr, cmd_name);
-    opcode = get_opcode(cmd_name);
-    instr_grp = get_instruction_group(cmd_name);
+	params = strchr(line_ptr, ' '); 
+	if(params != NULL)
+	{
+		params = params + 1; 
+	}
 
-    switch (instr_grp){
-        /* TODO:
-         * In each case,
-         * Parse the right parameters (according to the group format) and call build_<>_instruction().
-         * If a parameter is a label, use:
-         * translate_label(<label_name>, labels_table_ptr, frame_no)
-         * else just send it as it is.
-         */
-        case I:
-            /* bitmap = build_I_instruction(opcode, rs, rt, immed); */
-            break;
-        case R:
-            /* bitmap = build_R_instruction(opcode, rs, rt, rd, funct_no); */
-            break;
-        case J:
-            /* bitmap = build_R_instruction(opcode, is_reg, addr); */
-            break;
-    }
+	get_cmd_name(line_ptr, cmd_name);
+	opcode = get_opcode(cmd_name);
+	instr_grp = get_instruction_group(cmd_name);
 
-    return bitmap;
+	switch (instr_grp) {
+	/* TODO:
+	 * In each case,
+	 * Parse the right parameters (according to the group format) and call build_<>_instruction().
+	 * If a parameter is a label, use:
+	 * translate_label(<label_name>, labels_table_ptr, frame_no)
+	 * else just send it as it is.
+	 */
+	case I:
+		token = strtok(params, ","); 
+		if (!(token + 1))
+		{
+			rs = 0; 
+			break; 
+		}
+		rs = atoi(token) + 1; 
+
+		token = strtok(NULL, ",");
+		if (!(token))
+		{
+			immed = 0; 
+			break; 
+		}
+		immed = atoi(token); 
+
+		token = strtok(NULL, ",");
+		if (!(token + 1))
+		{
+			rt = 0; 
+			break; 
+		}
+		rt = atoi(token) + 1; 
+	        bitmap = build_I_instruction(opcode, rs, rt, immed); 
+	        break;
+	case R:
+		token = strtok(params, ","); 
+		if (!(token + 1))
+		{
+			rs = 0; 
+			break; 
+		}
+		rs = atoi(token) + 1; 
+
+		token = strtok(NULL, ",");
+		if (!(token + 1))
+		{
+			rt = 0; 
+			break; 
+		}
+		rt = atoi(token) + 1; 
+
+		token = strtok(NULL, ",");
+		if (!token)
+		{
+			rd = 0;
+			break; 
+		}
+		rd = atoi(token) + 1;
+ 
+            	bitmap = build_R_instruction(opcode, rs, rt, rd, funct_no); 
+            	break;
+	case J:
+		if (strchr(params, '$'))
+		{
+			is_reg = 1; 
+			addr = atoi(params + 1);
+		}
+		else
+		{
+			addr = translate_label(params, labels_table_ptr, frame_no); 
+		}
+		bitmap = build_J_instruction(opcode, is_reg, addr); 
+	    	break;
+	}
+
+	return bitmap;
 }
 
 void print_bitmap_32(BITMAP_32 *bitmap){
