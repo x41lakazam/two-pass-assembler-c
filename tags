@@ -46,6 +46,7 @@ contain_label	first_pass.c	/^bool contain_label(char *s){$/;"	f	typeref:typename
 create_label	labels.c	/^Label *create_label(LabelsTable *tbl_ptr, int addr, char *name, int is_code, int is_entry, int i/;"	f	typeref:typename:Label *
 data	linked_list.c	/^    int data;$/;"	m	struct:Node	typeref:typename:int	file:
 dump_bitmap	encoder.c	/^void dump_bitmap(BITMAP_32 *bitmap, char *fname, int line_no) {$/;"	f	typeref:typename:void
+encode_instruction_line	encoder.c	/^BITMAP_32 *encode_instruction_line(char *line_ptr, LabelsTable *labels_table_ptr){$/;"	f	typeref:typename:BITMAP_32 *
 external	globals.h	/^	external = 1$/;"	e	enum:label_tags
 first_pass	first_pass.c	/^void first_pass(char *fname, char *of){$/;"	f	typeref:typename:void
 get_instruction	instructions.c	/^char *get_instruction(char *line_ptr){$/;"	f	typeref:typename:char *

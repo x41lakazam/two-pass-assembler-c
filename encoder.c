@@ -21,15 +21,16 @@ void dump_bitmap(BITMAP_32 *bitmap, char *fname, int line_no) {
 }
 
 void get_cmd_name(char *line_ptr, char *buf){
-    int i;
-
-    i=0;
+    int i = 0;
 
     while (i < 4 && *line_ptr != ' ')
         *buf++ = *line_ptr++;
 }
 
-InstructionsGroup get_instruction_group(char *cmd_name){}
+InstructionsGroup get_instruction_group(char *cmd_name){
+    /* TODO */
+    return R; /* Debug */
+}
 
 int translate_label(char *lbl_name, LabelsTable *labels_tbl_ptr, int frame_addr){
     Label *lbl;
@@ -45,35 +46,36 @@ int translate_label(char *lbl_name, LabelsTable *labels_tbl_ptr, int frame_addr)
     return lbl_addr - frame_addr;
 }
 
-BITMAP_32 *encode_instruction_line(char *line_ptr, LabelsTable *labels_table_ptr, int addr){
+BITMAP_32 *encode_instruction_line(char *line_ptr, LabelsTable *labels_table_ptr, int frame_no){
     BITMAP_32 *bitmap;
     InstructionsGroup instr_grp;
     char cmd_name[5];
-    int opcode, funct;
 
+    int opcode;
     int rs,rt,rd; /* Hold registers numbers */
-    int int_buf; /* Integer buffer for Immed variable for I group or address for J group or funct_no for R*/
+    int immed, addr, funct_no; /* Integer buffers specific to each group*/
     int is_reg; /* register flag for J group */
 
     get_cmd_name(line_ptr, cmd_name);
-    opcode = get_op_code(cmd_name);
-
+    opcode = get_opcode(cmd_name);
     instr_grp = get_instruction_group(cmd_name); /* TODO */
 
     switch (instr_grp){
-        /* Retrieve right parameters (according to the group format) and call build_<>_instruction */
-        /* If a parameter is a label, use:
-         * translate_label(<label_name>, labels_table_ptr, addr)
-         * Else just send it as it is
+        /* TODO:
+         * In each case,
+         * Parse the right parameters (according to the group format) and call build_<>_instruction().
+         * If a parameter is a label, use:
+         * translate_label(<label_name>, labels_table_ptr, frame_no)
+         * else just send it as it is.
          */
         case I:
-            /* bitmap = build_I_instruction(opcode, rs, rt, int_buf); */
+            /* bitmap = build_I_instruction(opcode, rs, rt, immed); */
             break;
         case R:
-            /* bitmap = build_R_instruction(opcode, rs, rt, rd, int_buf); */
+            /* bitmap = build_R_instruction(opcode, rs, rt, rd, funct_no); */
             break;
         case J:
-            /* bitmap = build_R_instruction(opcode, is_reg, int_buf); */
+            /* bitmap = build_R_instruction(opcode, is_reg, addr); */
             break;
     }
 
@@ -85,10 +87,9 @@ void print_bitmap_32(BITMAP_32 *bitmap){
     int bit;
 
     /* For each bit, if it's on print a 1, else print a 0 */
-    for (i=1; i <= 31; i++){
-        bit = TestBit(*bitmap, i);
-        bit ? printf("1") : printf("0");
-    }
+    for (i=1; i <= 31; i++)
+        TestBit(*bitmap, i) ? printf("1") : printf("0");
+
     printf("\n");
 }
 

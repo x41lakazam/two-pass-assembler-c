@@ -6,10 +6,6 @@
 #include "encoder.h"
 #include "utils.h"
 
-void add_data_to_map(char *line_ptr, MemoryMap *map_ptr){
-    return;
-}
-
 void second_pass(char *fname, LabelsTable *labels_table_ptr, char *of, int dc_offset){
 	FILE *fp;
     char *line_ptr;
@@ -60,7 +56,7 @@ void second_pass(char *fname, LabelsTable *labels_table_ptr, char *of, int dc_of
         /* === If we got here, then it's a code instruction === */
 
         /* Encode the line to binary */
-        bitmap = encode_instruction_line(line_ptr, labels_table_ptr); /* TODO - Bit one */
+        bitmap = encode_instruction_line(line_ptr, labels_table_ptr, ic);
 
         ic += 4;
 
