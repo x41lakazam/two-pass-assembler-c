@@ -5,9 +5,12 @@
 
 char *get_label(char *line) {
 	char* label;
- 	char* line_cpy = (char *) calloc(LINE_MAX_SIZE, sizeof(char));
+	
+	/*strtok changes the string */
+ 	char* line_cpy = (char *) calloc(LINE_MAX_SIZE, sizeof(char)); 
 	strcpy(line_cpy, line);
-	label = strtok(line_cpy, ":");
+
+	label = strtok(line_cpy, ":"); /* parse the label */
 	return label;
 }
 
