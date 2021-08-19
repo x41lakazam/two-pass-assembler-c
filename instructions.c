@@ -112,14 +112,14 @@ int get_required_cells(char *line_ptr) {
 	if (strcmp(instruction_name, ".asciz") == 0)
 	{
         /* Warning: strlen also count double quotes and ending whitespaces */
-		counter += strlen(instruction_params) + 1;
+		counter += strlen(instruction_params) - 2;/* not counting the double qoutes */ 
 	}
 	else
 	{
 		token = strtok(instruction_params, ",");
 		while (token)
 		{
-			counter += 1;
+			counter += 1;/* every parameter is stored in one memory cell */
 			token = strtok(NULL, ",");
 		}
 
