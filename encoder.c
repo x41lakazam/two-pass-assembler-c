@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "encoder.h"
 #include "labels.h"
 #include "globals.h"
@@ -119,6 +120,8 @@ BITMAP_32 *encode_instruction_line(char *line_ptr, LabelsTable *labels_table_ptr
     int immed, addr, funct_no; /* Integer buffers specific to each group*/
     int is_reg; /* register flag for J group */
 
+    bitmap = (BITMAP_32 *) calloc(1, sizeof(BITMAP_32));
+
     get_cmd_name(line_ptr, cmd_name);
     opcode = get_opcode(cmd_name);
     instr_grp = get_instruction_group(cmd_name);
@@ -169,13 +172,15 @@ void add_obj_to_bitmap(int obj, int *start_ix, int size, BITMAP_32 *bitmap){
             SetBit(*bitmap, *start_ix); /* Set it in the bitmap if we need to */
 
         (*start_ix)++; /* Increment index */
-
     }
+    (*start_ix)--;
 }
 
 BITMAP_32 *build_R_instruction(int opcode, int rs, int rt, int rd, int funct_no) {
     BITMAP_32 *bitmap;
     int bit_ix;
+
+    bitmap = (BITMAP_32 *) calloc(1, sizeof(BITMAP_32));
 
     /* Start at bit 0 (left one)*/
     bit_ix = 0;
@@ -204,6 +209,7 @@ BITMAP_32 *build_I_instruction(int opcode, int rs, int rt, int immed) {
     BITMAP_32 *bitmap;
     int bit_ix;
 
+    bitmap = (BITMAP_32 *) calloc(1, sizeof(BITMAP_32));
     /* Start at bit 0 (left one)*/
     bit_ix = 0;
 
@@ -226,6 +232,7 @@ BITMAP_32 *build_J_instruction(int opcode, int is_reg, int addr) {
     BITMAP_32 *bitmap;
     int bit_ix;
 
+    bitmap = (BITMAP_32 *) calloc(1, sizeof(BITMAP_32));
     /* Start at bit 0 (left one)*/
     bit_ix = 0;
 
