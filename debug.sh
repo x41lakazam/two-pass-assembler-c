@@ -1,2 +1,2 @@
 ./compile.sh
-gdb a.out
+gdb a.out --command=debug.gdb

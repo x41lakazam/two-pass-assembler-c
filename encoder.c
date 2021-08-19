@@ -111,41 +111,110 @@ int translate_label(char *lbl_name, LabelsTable *labels_tbl_ptr, int frame_addr)
 }
 
 BITMAP_32 *encode_instruction_line(char *line_ptr, LabelsTable *labels_table_ptr, int frame_no){
-    BITMAP_32 *bitmap;
-    InstructionsGroup instr_grp;
-    char cmd_name[5];
+	BITMAP_32 *bitmap;
+	InstructionsGroup instr_grp;
+	char cmd_name[5];
 
-    int opcode;
-    int rs,rt,rd; /* Hold registers numbers */
-    int immed, addr, funct_no; /* Integer buffers specific to each group*/
-    int is_reg; /* register flag for J group */
+	int opcode;
+	int rs,rt,rd; /* Hold registers numbers */
+	int immed, addr, funct_no; /* Integer buffers specific to each group*/
+	int is_reg = 0; /* register flag for J group */
+	char* token;
+	char* params; /* the cmd line without the cmd itself */
 
     bitmap = (BITMAP_32 *) calloc(1, sizeof(BITMAP_32));
 
-    get_cmd_name(line_ptr, cmd_name);
-    opcode = get_opcode(cmd_name);
-    instr_grp = get_instruction_group(cmd_name);
+	params = strchr(line_ptr, ' ');
+	if(params != NULL)
+	{
+		params = params + 1;
+	}
 
-    switch (instr_grp){
-        /* TODO:
-         * In each case,
-         * Parse the right parameters (according to the group format) and call build_<>_instruction().
-         * If a parameter is a label, use:
-         * translate_label(<label_name>, labels_table_ptr, frame_no)
-         * else just send it as it is.
-         */
+	get_cmd_name(line_ptr, cmd_name);
+	opcode = get_opcode(cmd_name);
+	instr_grp = get_instruction_group(cmd_name);
+
+    /* Parse the line and encode it accordingly to the operation's group */
+	switch (instr_grp) {
+        /* I group */
         case I:
-            /* bitmap = build_I_instruction(opcode, rs, rt, immed); */
-            break;
-        case R:
-            /* bitmap = build_R_instruction(opcode, rs, rt, rd, funct_no); */
-            break;
-        case J:
-            /* bitmap = build_R_instruction(opcode, is_reg, addr); */
-            break;
-    }
+            /* Parse first register */
+            token = strtok(params, ",");
+            rs = atoi(token+1);
 
-    return bitmap;
+            /*
+             * If the operation is one of bne, beq, blt or bgt,
+             * the format is "OP $rs, $rt, LABEL"
+             * else it will be in the format "OP $rs, Immed (const), $rt"
+             */
+            if (STREQ(cmd_name, "bne") ||
+                STREQ(cmd_name, "beq") ||
+                STREQ(cmd_name, "blt") ||
+                STREQ(cmd_name, "bgt")
+                ){
+
+                /* Parse second register */
+                token = strtok(NULL, ",");
+                rt = atoi(token + 1);
+
+                /* Parse the label */
+                token = strtok(NULL, ",");
+                immed = translate_label(token, labels_table_ptr, frame_no);
+            }
+            else{
+                /* Parse immed (constant) */
+                token = strtok(NULL, ",");
+                immed = atoi(token);
+
+                /* Parse rt */
+                token = strtok(NULL, ",");
+                rt = atoi(token+1);
+            }
+
+            /* Build bitmap */
+            bitmap = build_I_instruction(opcode, rs, rt, immed);
+            break;
+
+        /* R group */
+        case R:
+            /* Parse first register */
+            token = strtok(params, ",");
+            rs = atoi(token) + 1;
+
+            /* Parse second register */
+            token = strtok(NULL, ",");
+            rt = atoi(token) + 1;
+
+            /* Parse third register only if opcode is 0, else set it to 0 */
+            if (opcode == 0){
+                token = strtok(NULL, ",");
+                rd = atoi(token) + 1;
+            }
+            else
+                rd = 0;
+
+            /* Build final bitmap */
+            bitmap = build_R_instruction(opcode, rs, rt, rd, funct_no);
+            break;
+
+        /* J group */
+        case J:
+            /* Check if the parameter is a register */
+            if (strchr(params, '$')) {
+                is_reg = 1;     /* Turn the register flag on */
+                addr = atoi(params + 1);    /* Parse the value of the register index */
+            }
+            else {
+                /* Else set addr to be the address the label points on */
+                addr = get_label_addr(labels_table_ptr, params);
+            }
+
+            /* Build final bitmap */
+            bitmap = build_J_instruction(opcode, is_reg, addr);
+            break;
+        }
+
+	return bitmap;
 }
 
 void print_bitmap_32(BITMAP_32 *bitmap){

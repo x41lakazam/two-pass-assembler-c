@@ -1,4 +1,4 @@
- bgt $4 $2,END
+ bgt $0, $31,END
 STR: .asciz "aBcd"
 LIST: .db 6,-9
  .dh 27056

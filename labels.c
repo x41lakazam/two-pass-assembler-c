@@ -73,6 +73,15 @@ Label *get_label_by_name(LabelsTable *tbl_ptr, char *name){
     return NULL;
 }
 
+int get_label_addr(LabelsTable *tbl_ptr, char *name){
+    Label *lbl;
+    lbl = get_label_by_name(tbl_ptr, name);
+    if (lbl == NULL)
+        return -1; /* TODO: label doesn't exist */
+
+    return lbl->value;
+}
+
 void mark_label_as_entry(LabelsTable *tbl, char *name){
     Label *label;
 

@@ -6,6 +6,7 @@
 #include "instructions.h"
 #include "labels.h"
 #include "utils.h"
+#include "globals.h"
 
 void second_pass(char *fname, LabelsTable *labels_table_ptr, char *of, int dc_offset){
 	FILE *fp;
@@ -20,13 +21,16 @@ void second_pass(char *fname, LabelsTable *labels_table_ptr, char *of, int dc_of
 
     int ic, dc;
 
-    ic = 100;
-    dc = 100 + dc_offset;
-
     BITMAP_32 *bitmap;
 
-	fp = fopen(fname, "r");
+    /* Init variables */
+    ic = 100;
+    dc = 100 + dc_offset;
+    line_ptr = (char *) calloc(LINE_MAX_SIZE, sizeof(char));
+	line_len = LINE_MAX_SIZE;
+
 	/* Check if the file is valid */
+	fp = fopen(fname, "r");
 	if (!fp){
 		printf("Bad file: %s\n", fname);
         return;
