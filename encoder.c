@@ -3,6 +3,7 @@
 #include "encoder.h"
 #include "labels.h"
 #include "globals.h"
+#include "math.h"
 
 int R_cmds_len = 8;
 char R_cmds[8][5] = {
@@ -44,21 +45,43 @@ char J_cmds[4][5] = {
 };
 
 void dump_bitmap(BITMAP_32 *bitmap, char *fname, int line_no) {
-	int i;
-	unsigned int j;
+	int i, j;
+    int bit;
+    unsigned int as_int;
     FILE *fp;
 
+    j = as_int = 0;
     fp = fopen(fname, "a");
 
-	for (i = 0; i < 4; i++)
-	{
-		for (j = 1 << 8; j > 0; j = j / 2)
-		{
-			(*bitmap[i] & j) ? fprintf(fp, "1") : fprintf(fp, "0");
-		}
+    fprintf(fp, "%04d ", line_no);
 
+    for (i = 32; i >= 1; i--){
+        bit = TestBit(*bitmap, i);
+
+        /* Add this bit to the integer */
+        if (bit)
+            as_int += (int) pow(2, j);
+
+        j++;
+
+        /* Every 8 bits: convert the decimal value to hexadecimal and print it in the file */
+        if (j == 8){
+            /* Dump the hex value */
+            fprintf(fp, "%02X", as_int);
+
+            /* Add a space if it's not the last byte */
+            if (i>0)
+                fprintf(fp, " ");
+
+            /* Reset j and as_int */
+            j = as_int = 0;
+        }
+
+
+    }
+
+    fprintf(fp, "\n");
     fclose(fp);
-	}
 }
 
 void tmp_dump_data_instruction(char *line_ptr, int addr){
@@ -251,7 +274,7 @@ void print_bitmap_32(BITMAP_32 *bitmap){
     int bit;
 
     /* For each bit, if it's on print a 1, else print a 0 */
-    for (i=1; i <= 31; i++)
+    for (i=0; i <= 31; i++)
         TestBit(*bitmap, i) ? printf("1") : printf("0");
 
     printf("\n");
