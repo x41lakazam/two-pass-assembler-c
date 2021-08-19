@@ -66,6 +66,7 @@ get_entry_label	labels.c	/^char *get_entry_label(char *line_ptr){$/;"	f	typeref:
 get_instruction	instructions.c	/^char *get_instruction(char *line_ptr){$/;"	f	typeref:typename:char *
 get_instruction_group	encoder.c	/^InstructionsGroup get_instruction_group(char *cmd_name){$/;"	f	typeref:typename:InstructionsGroup
 get_label	labels.c	/^char *get_label(char *line) {$/;"	f	typeref:typename:char *
+get_label_addr	labels.c	/^int get_label_addr(LabelsTable *tbl_ptr, char *name){$/;"	f	typeref:typename:int
 get_label_by_name	labels.c	/^Label *get_label_by_name(LabelsTable *tbl_ptr, char *name){$/;"	f	typeref:typename:Label *
 get_opcode	encoder.c	/^int get_opcode(char *cmd_name){$/;"	f	typeref:typename:int
 get_required_cells	instructions.c	/^int get_required_cells(char *line_ptr) {$/;"	f	typeref:typename:int

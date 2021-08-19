@@ -1,4 +1,5 @@
- bgt $0, $31,END
+jmp $9
+bgt $0,$31,END
 STR: .asciz "aBcd"
 LIST: .db 6,-9
  .dh 27056
@@ -8,7 +9,6 @@ K: .dw 31,-12
 MAIN: add $3,$5,$9
 LOOP: ori $9,-5,$2
 la val1
- jmp Next
 Next: move $20,$4
  la K
  sw $0,4,$10

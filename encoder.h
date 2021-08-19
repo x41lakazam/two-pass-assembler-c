@@ -37,7 +37,7 @@ BITMAP_32 *build_J_instruction(int opcode, int is_reg, int addr);
 /*
  * Return the difference between a label's address and the current frame index
  */
-int translate_label(char *lbl_name, LabelsTable *labels_tbl_ptr, int frame_addr);
+int get_label_addr_dist(char *lbl_name, LabelsTable *labels_tbl_ptr, int frame_addr);
 
 InstructionsGroup get_instruction_group(char *cmd);
 

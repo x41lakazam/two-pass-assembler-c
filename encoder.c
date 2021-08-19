@@ -96,7 +96,7 @@ int get_opcode(char *cmd_name){
 	return 0; /* TODO */
 }
 
-int translate_label(char *lbl_name, LabelsTable *labels_tbl_ptr, int frame_addr){
+int get_label_addr_dist(char *lbl_name, LabelsTable *labels_tbl_ptr, int frame_addr){
     Label *lbl;
     int lbl_addr;
 
@@ -136,17 +136,17 @@ BITMAP_32 *encode_instruction_line(char *line_ptr, LabelsTable *labels_table_ptr
 
     /* Parse the line and encode it accordingly to the operation's group */
 	switch (instr_grp) {
-        /* I group */
+		/*
+		 * I group:
+		 * If the operation is one of bne, beq, blt or bgt,
+		 * the format is "OP $rs, $rt, LABEL"
+		 * else it will be in the format "OP $rs, Immed (const), $rt"
+		 */
         case I:
             /* Parse first register */
             token = strtok(params, ",");
             rs = atoi(token+1);
 
-            /*
-             * If the operation is one of bne, beq, blt or bgt,
-             * the format is "OP $rs, $rt, LABEL"
-             * else it will be in the format "OP $rs, Immed (const), $rt"
-             */
             if (STREQ(cmd_name, "bne") ||
                 STREQ(cmd_name, "beq") ||
                 STREQ(cmd_name, "blt") ||
@@ -159,7 +159,7 @@ BITMAP_32 *encode_instruction_line(char *line_ptr, LabelsTable *labels_table_ptr
 
                 /* Parse the label */
                 token = strtok(NULL, ",");
-                immed = translate_label(token, labels_table_ptr, frame_no);
+                immed = get_label_addr_dist(token, labels_table_ptr, frame_no);
             }
             else{
                 /* Parse immed (constant) */
@@ -175,8 +175,13 @@ BITMAP_32 *encode_instruction_line(char *line_ptr, LabelsTable *labels_table_ptr
             bitmap = build_I_instruction(opcode, rs, rt, immed);
             break;
 
-        /* R group */
+		/*
+		 * R group:
+		 * Every command with opcode 0 need 3 arguments, while commands
+		 * with opcode 1 only need 2.
+		 */
         case R:
+
             /* Parse first register */
             token = strtok(params, ",");
             rs = atoi(token) + 1;
@@ -197,15 +202,30 @@ BITMAP_32 *encode_instruction_line(char *line_ptr, LabelsTable *labels_table_ptr
             bitmap = build_R_instruction(opcode, rs, rt, rd, funct_no);
             break;
 
-        /* J group */
+		/*
+		 * J group:
+		 * If the command is a JMP command, the parameter can either be
+		 * a register or a label
+		 * If the command is a LA or CALL command, then the parameter can
+		 * only be a label
+		 * If the command is a STOP command, then it's not followed by anything
+		 * and the bitmap will be full of 0, except for the opcode
+		 */
         case J:
-            /* Check if the parameter is a register */
-            if (strchr(params, '$')) {
-                is_reg = 1;     /* Turn the register flag on */
+
+			/* If - Command is stop */
+			if (STREQ(cmd_name, "stop"))
+				addr = 0;
+
+			/* Else if - Command is jmp and the argument is a register */
+			else if (STREQ(cmd_name, "jmp") && strchr(params, '$')){
+                is_reg = 1;					/* Turn the register flag on */
                 addr = atoi(params + 1);    /* Parse the value of the register index */
             }
-            else {
-                /* Else set addr to be the address the label points on */
+
+			/* Else - Command is not stop and the argument is a label */
+			else {
+                /* Set addr to be the address the label points on */
                 addr = get_label_addr(labels_table_ptr, params);
             }
 

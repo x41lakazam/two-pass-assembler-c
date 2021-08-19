@@ -16,6 +16,30 @@ char *trim_whitespaces(char *s){
     return s;
 }
 
+char *clean_str(char *s){
+    int i;
+    /* TODO: Line should be in this format:
+     *  OP arg1,arg2,arg3
+     */
+
+    /* Remove trailing whitespaces */
+    s = trim_whitespaces(s);
+
+    /* Remove unwanted characters */
+    while (s[i]){
+
+        /* If the character is a line break, cut the string */
+        if (s[i] == '\n'){
+            s[i] = '\0';
+            break;
+        }
+
+        i++;
+    }
+
+    return s;
+}
+
 /*
  * Check if <s> starts with <t>
  */

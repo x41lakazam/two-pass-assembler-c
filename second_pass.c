@@ -37,8 +37,8 @@ void second_pass(char *fname, LabelsTable *labels_table_ptr, char *of, int dc_of
     }
 
 	while ((read_cnt = getline(&line_ptr, &line_len, fp)) != -1) {
-        /* remove every leading whitespaces */
-        line_ptr = trim_whitespaces(line_ptr);
+        /* Clean the line (remove unwanted characters) */
+        line_ptr = clean_str(line_ptr);
 
         /* Ignore every irrelevant line (comments/empty...) */
         if (!relevant_line(line_ptr))
