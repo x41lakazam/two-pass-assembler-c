@@ -103,6 +103,10 @@ int get_label_addr_dist(char *lbl_name, LabelsTable *labels_tbl_ptr, int frame_a
     /* Retrieve the right label */
     lbl = get_label_by_name(labels_tbl_ptr, lbl_name);
 
+	/* If the label is external, return 0 */
+	if (lbl->is_external == 1)
+		return 0;
+
     /* Get its address */
     lbl_addr = lbl->value;
 
@@ -160,6 +164,11 @@ BITMAP_32 *encode_instruction_line(char *line_ptr, LabelsTable *labels_table_ptr
                 /* Parse the label */
                 token = strtok(NULL, ",");
                 immed = get_label_addr_dist(token, labels_table_ptr, frame_no);
+
+				/* Check if label is external */
+				if (immed == 0){
+					/* TODO: ERROR - Label should not be external */
+				}
             }
             else{
                 /* Parse immed (constant) */

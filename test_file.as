@@ -1,5 +1,5 @@
-jmp $9
-bgt $0,$31,END
+bgt $0,  $31 ,   END
+    jmp $9
 STR: .asciz "aBcd"
 LIST: .db 6,-9
  .dh 27056

@@ -4,7 +4,8 @@
 
 #include <string.h>
 #include <stdbool.h>
-
+#include <stdlib.h>
+#include <ctype.h>
 #include "globals.h"
 
 /*
@@ -16,28 +17,48 @@ char *trim_whitespaces(char *s){
     return s;
 }
 
+
+/*
+ * Clean a string:
+ * remove trailing whitespaces/unwanted chars
+ * remove extra whitespaces
+ */
 char *clean_str(char *s){
-    int i;
-    /* TODO: Line should be in this format:
-     *  OP arg1,arg2,arg3
-     */
+    int i, j;
+    char *clean_s; /* Hold the new and clean string */
+    int first_whitespace = 1; /* Flag - true if no whitespace have been seen yet */
+
+    clean_s = (char *) calloc(LINE_MAX_SIZE, sizeof(char));
 
     /* Remove trailing whitespaces */
     s = trim_whitespaces(s);
 
-    /* Remove unwanted characters */
+    i = j = 0;
+
+    /* Remove extra whitespaces and linebreak */
     while (s[i]){
 
-        /* If the character is a line break, cut the string */
-        if (s[i] == '\n'){
-            s[i] = '\0';
-            break;
+        /* If the char is a whitespace:
+         * if it's the first one then add it, else ignore it */
+        if (s[i] == ' '){
+            if ( first_whitespace ){
+                first_whitespace = 0;
+                clean_s[j++] = s[i];
+            }
+            i++;
         }
 
-        i++;
+        /* If the char is a linebreak, don't add it */
+        else if (s[i] == '\n')
+            break;
+
+        /* If the char is a wanted char, simply add it */
+        else
+            clean_s[j++] = s[i++];
     }
 
-    return s;
+    clean_s[j] = '\0';
+    return clean_s;
 }
 
 /*
