@@ -1,13 +1,14 @@
+#include <stdlib.h>
+#include <ctype.h>
 #include "globals.h"
 #include "labels.h"
 #include "utils.h"
-#include <stdlib.h>
 
 char *get_label(char *line) {
 	char* label;
-	
+
 	/*strtok changes the string */
- 	char* line_cpy = (char *) calloc(LINE_MAX_SIZE, sizeof(char)); 
+ 	char* line_cpy = (char *) calloc(LINE_MAX_SIZE, sizeof(char));
 	strcpy(line_cpy, line);
 
 	label = strtok(line_cpy, ":"); /* parse the label */
@@ -15,8 +16,17 @@ char *get_label(char *line) {
 }
 
 char *get_entry_label(char *line_ptr){
-	/* TODO: Return second word */
-	return "DEBUG";
+	char *s;
+
+	/* Jump to the next word */
+	while ( !isspace(*line_ptr++) ){} /* Move to next whitespace */
+	while ( isspace(*line_ptr++) ){} /* Move to next char */
+
+	/* Copy the next word */
+	while ( !isspace(*line_ptr) )
+		*s++ = *line_ptr++;
+
+	return s;
 }
 
 char *trim_label(char *line){
