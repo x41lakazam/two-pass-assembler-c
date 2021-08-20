@@ -26,8 +26,8 @@ void second_pass(char *fname, LabelsTable *labels_table_ptr, char *of, int dc_of
     /* Init variables */
     ic = 100;
     dc = 100 + dc_offset;
-    line_ptr = (char *) calloc(LINE_MAX_SIZE, sizeof(char));
 	line_len = LINE_MAX_SIZE;
+    line_ptr = (char *) calloc(line_len, sizeof(char));
 
 	/* Check if the file is valid */
 	fp = fopen(fname, "r");

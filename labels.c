@@ -73,11 +73,16 @@ Label *get_label_by_name(LabelsTable *tbl_ptr, char *name){
     return NULL;
 }
 
-int get_label_addr(LabelsTable *tbl_ptr, char *name){
+int get_label_addr(LabelsTable *tbl_ptr, char *name, int frame_no){
     Label *lbl;
     lbl = get_label_by_name(tbl_ptr, name);
     if (lbl == NULL)
         return -1; /* TODO: label doesn't exist */
+
+	/* If the label is external, add it to the external files */
+	if (lbl->is_external){
+		dump_external_label(lbl, frame_no);
+	}
 
     return lbl->value;
 }

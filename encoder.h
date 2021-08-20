@@ -47,4 +47,6 @@ void tmp_dump_data_instruction(char *line_ptr, int addr);
 
 void merge_tmp_data_file();
 
+void delete_tmp_data_file();
+
 #endif

@@ -68,6 +68,6 @@ void add_external_variable(LabelsTable *tbl_ptr, char *label_name);
 
 void add_data_offset(LabelsTable *tbl_ptr, int offset);
 
-int get_label_addr(LabelsTable *tbl_ptr, char *name);
+int get_label_addr(LabelsTable *tbl_ptr, char *name, int frame_no);
 
 #endif

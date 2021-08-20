@@ -5,6 +5,10 @@
 #include "globals.h"
 #include "math.h"
 
+#define TMP_DATA_MMAP_FILE "tmp_data_mmap.ob"
+#define TMP_ENTRIES_MMAP_FILE "tmp_entries_mmap.ob"
+#define TMP_EXTERNALS_MMAP_FILE "tmp_externals_mmap.ob"
+
 int R_cmds_len = 8;
 char R_cmds[8][5] = {
 	"add",
@@ -88,8 +92,59 @@ void tmp_dump_data_instruction(char *line_ptr, int addr){
 	/* TODO */
 }
 
-void merge_tmp_data_file(){
-	/* TODO */
+char *get_entries_outfile(char *filename);
+char *get_externals_outfile(char *filename);
+char *get_basename(char *filename);
+void dump_entry_labels(LabelsTable *labels_tbl_ptr, char *outfile);
+void tmp_dump_external_labels(LabelsTable *labels_table_ptr, int frame_no);
+
+void tmp_dump_entry_labels(LabelsTable *labels_tbl_ptr){
+    Label *lbl;
+    FILE *fp;
+    char *entries_filename;
+
+    fp = fopen(TMP_ENTRIES_MMAP_FILE, "w");
+
+    /* Iterate over each label and print the label in the file if it's an entry */
+    while (labels_tbl_ptr != NULL){
+        /* Retrieve label */
+        lbl = labels_tbl_ptr->label;
+
+        /* If the label is an entry, add it to the file in the right format */
+        if (lbl->is_entry){
+            fprintf(fp, "%s %04d\n", lbl->label, lbl->value);
+        }
+        /* Move on to the next node */
+        labels_tbl_ptr = labels_tbl_ptr->next;
+    }
+
+    fclose(fp);
+}
+
+void merge_tmp_data_file(char *dst_fname){
+    char *line_ptr;
+    int read_cnt;
+    size_t line_len;
+    FILE *src_fp, *dst_fp;
+
+    line_len = 30;
+    line_ptr = (char *) calloc(line_len, sizeof(char));
+
+    src_fp = fopen(TMP_DATA_MMAP_FILE, "r");
+    dst_fp = fopen(dst_fname, "a");
+
+    while ((read_cnt = getline(&line_ptr, &line_len, src_fp))){
+        fprintf(dst_fp, line_ptr); /* TODO */
+    }
+
+    fclose(src_fp);
+    fclose(dst_fp);
+
+    delete_tmp_data_file();
+}
+
+void delete_tmp_data_file(){
+    /* TODO */
 }
 
 void get_cmd_name(char *line_ptr, char *buf){
@@ -258,7 +313,7 @@ BITMAP_32 *encode_instruction_line(char *line_ptr, LabelsTable *labels_table_ptr
 			/* Else - Command is not stop and the argument is a label */
 			else {
                 /* Set addr to be the address the label points on */
-                addr = get_label_addr(labels_table_ptr, params);
+                addr = get_label_addr(labels_table_ptr, params, frame_no);
             }
 
             /* Build final bitmap */
