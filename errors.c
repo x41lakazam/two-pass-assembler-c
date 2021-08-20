@@ -79,3 +79,7 @@ bool is_value_in_range(int value, int start, int end)
 	return false;
 } 
 
+bool validate_commas(char* line_ptr) 
+{
+}
+

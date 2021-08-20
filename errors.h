@@ -81,4 +81,26 @@ true if the value is within the range and false if not.
 */
 bool is_value_in_range(int value, int start, int end); 
 
+/*
+This method checks all comma-realted errors: commas at beginning or end, 
+or consecutive commas.
+Args:
+line_ptr - the line to validate.
+Return:
+true if there are no comma-related error and false if not.
+*/
+bool validate_commas(char* line_ptr);
+
+
+
+
+
+
+
+
+
+
+
+
+
 
