@@ -48,17 +48,20 @@ bool is_instruction(char *s){
 }
 
 char *get_instruction(char *line_ptr){
-	char* find_instruction;
+	char* find_instruction; /* pointer to the begiining of the instruction in the line */ 
 	char* name;
 	int i;
-	char* line_cpy =  (char *) calloc(MAX_CMD_LENGTH, sizeof(char));
+
+	char* line_cpy =  (char *) calloc(MAX_CMD_LENGTH, sizeof(char)); /* strtok changes the string */
 	strcpy(line_cpy, line_ptr);
+
+	/* look for every possible instruction */
 	for (i=0; i < instructions_cnt; i++)
 	{
 		find_instruction = strstr(line_cpy, instructions[i]);
 		if (find_instruction)
 		{
-			name = strtok(find_instruction, " ");
+			name = strtok(find_instruction, " "); /* parse instruction name */
 			return name;
 		}
 	}
@@ -66,7 +69,7 @@ char *get_instruction(char *line_ptr){
 }
 
 bool is_entry_instruction(char *line_ptr) {
-	char* entry = ".entry";
+	char* entry = ".entry"; 
 	if (strstr(line_ptr, entry))
 	{
 		return true;
@@ -86,9 +89,11 @@ bool is_external_instruction(char *line_ptr) {
 char *parse_external_var_name(char *line_ptr) {
 	/* i am assuming that the var name is always the second word in the line */
 
-	char* token;
-	char* line_cpy =  (char *) calloc(80, sizeof(char));
+	char* token; /* for strtok */ 
+
+	char* line_cpy =  (char *) calloc(80, sizeof(char)); /* strtok changes the original string */ 
 	strcpy(line_cpy, line_ptr);
+
 	token = strtok(line_cpy, " ");
 	token = strtok(NULL, " ");
 	return token;
@@ -96,9 +101,10 @@ char *parse_external_var_name(char *line_ptr) {
 
 int get_required_cells(char *line_ptr) {
 	char* instruction_name = get_instruction(line_ptr);
-	char* token;
-	int counter = 0;
+	char* token; /* for strtok - parse the instruction parameters */ 
+	int counter = 0; /* counts the required cells ans retunrs them */
 
+	/* parse out the instrcuctions parameters without the instartucion name */
 	char* instruction_params = (char *) calloc(80, sizeof(char));
 	strcpy(instruction_params, line_ptr + strlen(instruction_name));
 	instruction_params = trim_whitespaces(instruction_params);
@@ -106,14 +112,14 @@ int get_required_cells(char *line_ptr) {
 	if (strcmp(instruction_name, ".asciz") == 0)
 	{
         /* Warning: strlen also count double quotes and ending whitespaces */
-		counter += strlen(instruction_params) + 1;
+		counter += strlen(instruction_params) - 2;/* not counting the double qoutes */ 
 	}
 	else
 	{
 		token = strtok(instruction_params, ",");
 		while (token)
 		{
-			counter += 1;
+			counter += 1;/* every parameter is stored in one memory cell */
 			token = strtok(NULL, ",");
 		}
 
