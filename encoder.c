@@ -1,10 +1,12 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
+#include "errors.h"
+#include "utils.h"
 #include "encoder.h"
 #include "labels.h"
 #include "globals.h"
-#include "math.h"
 #include "instructions.h"
 
 #define TMP_DATA_MMAP_FILE "tmp_data_mmap.ob"
@@ -59,6 +61,9 @@ void dump_bitmap(BITMAP_32 *bitmap, char *fname, int line_no) {
     j = as_int = 0;
     fp = fopen(fname, "a");
 
+    if (fp == NULL)
+        raise_error("File doesn't exist");
+
     fprintf(fp, "%04d ", line_no);
 
     for (i = 32; i >= 1; i--){
@@ -95,12 +100,14 @@ void dump_bitmap(BITMAP_32 *bitmap, char *fname, int line_no) {
  * :param cell_count: (int) Number of cells filled by data instruction, everytime this number reach 4,
  * dump the line.
  */
-void tmp_dump_data_instruction(char *line_ptr, int *data_frame_no, BITMAP_32 *data_bitmap){
+void tmp_dump_data_instruction(char *line_ptr){
     char *token; /* Used for strtok */
     char *instruction_name; /* Name of the data instruction */
     char *params; /* Parameters of the lines */
     int size; /* Size of the encoded word in bits */
     int shift; /* Shift in the bits of the bitmap */
+    int i, val; /* Temporary variables */
+    FILE *fp;
 
 	params = (char *) calloc(LINE_MAX_SIZE, sizeof(char));
 	strcpy(params, line_ptr + strlen(instruction_name));
@@ -113,6 +120,8 @@ void tmp_dump_data_instruction(char *line_ptr, int *data_frame_no, BITMAP_32 *da
     while ( isspace(*line_ptr) )
         line_ptr++;
 
+    fp = fopen(TMP_DATA_MMAP_FILE, "a");
+
 	instruction_name = get_instruction(line_ptr);
     if (STREQ(instruction_name, ".asciz")){
         /* Encode every character between the quotes and dump them */
@@ -122,51 +131,37 @@ void tmp_dump_data_instruction(char *line_ptr, int *data_frame_no, BITMAP_32 *da
 
         /* Parse until the closing quote */
         while (*line_ptr != '"'){
-
-            /* calculate the shift of the bits in the map given the data frame index */
-            shift = (*data_frame_no % 4) * 8 ;
-
-            /* Encode the character to the bitmap */
-            add_obj_to_bitmap( *line_ptr, &shift, 8, data_bitmap);
-
-            /* Check if this was the last word in the bitmap (for example if frame_no is 103),
-             * in this case dump it */
-            if (*data_frame_no % 4 == 3)
-                dump_bitmap(data_bitmap, TMP_DATA_MMAP_FILE, (*data_frame_no-3));
-
-            /* Move line_ptr and add one to data_frame_no */
-            line_ptr++;
-            (*data_frame_no)++;
+            for(i = 7; i >= 0; i-- )
+                fprintf(fp, "%d", ( *line_ptr++ >> i ) & 1 ? 1 : 0 );
         }
     }
     else{
         /* Encode every number  */
         if (STREQ(instruction_name, ".db"))
-            size = 1;
+            size = 8;
         else if (STREQ(instruction_name, ".dh"))
-            size = 2;
+            size = 16;
         else /* instruction is .dw*/
-            size = 4;
+            size = 32;
 
 		token = strtok(params, ",");
 		while (token)
 		{
-            /* calculate the shift of the bits in the map given the data frame index */
-            shift = (*data_frame_no % 4) * 8 ;
+            val = atoi(token);
 
-            /* Encode the number in the right size in the bitmap */
-            add_obj_to_bitmap(atoi(token), &shift, size, data_bitmap);
+            for(i = size-1; i >= 0; i-- )
+                fprintf(fp, "%d", ( val >> i ) & 1 ? 1 : 0 );
 
-            /* Check if this was the last word in the bitmap (for example if frame_no is 103),
-             * in this case dump it */
-            if (*data_frame_no % 4 == 3)
-                dump_bitmap(data_bitmap, TMP_DATA_MMAP_FILE, (*data_frame_no-3));
-
-            (*data_frame_no) += size;
 			token = strtok(NULL, ",");
 		}
     }
 
+    fclose(fp);
+
+
+}
+
+char *char_to_bin(char c){
 
 }
 

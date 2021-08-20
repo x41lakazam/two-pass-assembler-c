@@ -104,7 +104,7 @@ int get_required_cells(char *line_ptr) {
 	char* token; /* for strtok - parse the instruction parameters */
 	int counter = 0; /* counts the required cells ans retunrs them */
 
-	/* parse out the instrcuctions parameters without the instartucion name */
+	/* parse out the instrcuctions parameters without the instruction name */
 	char* instruction_params = (char *) calloc(80, sizeof(char));
 	strcpy(instruction_params, line_ptr + strlen(instruction_name));
 	instruction_params = trim_whitespaces(instruction_params);

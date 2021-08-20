@@ -28,7 +28,7 @@ BITMAP_32 *encode_instruction_line(char *line_ptr, LabelsTable *, int addr);
  */
 void dump_bitmap(BITMAP_32 *, char *, int);
 
-void tmp_dump_data_instruction(char *line_ptr, int data_frame_no, BITMAP_32 *data_bitmap);
+void tmp_dump_data_instruction(char *line_ptr);
 
 BITMAP_32 *build_R_instruction(int opcode, int rs, int rt, int rd, int funct_no);
 BITMAP_32 *build_I_instruction(int opcode, int rs, int rt, int immed);
@@ -62,5 +62,10 @@ void delete_tmp_files();
  * Add an external label to the temporary external labels file
  */
 void tmp_dump_external_label(char *lbl_name, LabelsTable *labels_table_ptr, int frame_no);
+
+/*
+ * Add an integer to the bitmap
+ */
+void add_obj_to_bitmap(int obj, int *start_ix, int size, BITMAP_32 *bitmap);
 
 #endif

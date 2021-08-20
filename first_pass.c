@@ -21,18 +21,6 @@ typedef struct Flags{
 
 
 /*
- * Return True if a string contains a label
- */
-bool contain_label(char *s){
-    while (*s){
-        if (*s++ == ':')
-            return true;
-    }
-    return false;
-}
-
-
-/*
  * Perform first pass on a file
  */
 void first_pass(char *fname, char *of){

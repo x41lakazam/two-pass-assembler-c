@@ -40,6 +40,11 @@ void second_pass(char *fname, LabelsTable *labels_table_ptr, char *of, int dc_of
         return;
     }
 
+    /* Create output file */
+    fopen(of, "w");
+
+    create_tmp_files();
+
 	while ((read_cnt = getline(&line_ptr, &line_len, fp)) != -1) {
         /* Clean the line (remove unwanted characters) */
         line_ptr = clean_str(line_ptr);
@@ -66,7 +71,7 @@ void second_pass(char *fname, LabelsTable *labels_table_ptr, char *of, int dc_of
 
         /* If it's a data instruction, add the data to the memory */
         if (is_instruction(line_ptr)){
-            tmp_dump_data_instruction(line_ptr, dc, data_bitmap); /* TODO - Big one */
+            tmp_dump_data_instruction(line_ptr);
             dc += get_required_cells(line_ptr);
             continue;
         }
@@ -86,4 +91,5 @@ void second_pass(char *fname, LabelsTable *labels_table_ptr, char *of, int dc_of
     merge_tmp_data_file();
 
 	fclose(fp);
+    delete_tmp_files();
 }
