@@ -4,6 +4,17 @@
 #include "labels.h"
 #include "utils.h"
 
+/*
+ * Return True if a string contains a label
+ */
+bool contain_label(char *s){
+    while (*s){
+        if (*s++ == ':')
+            return true;
+    }
+    return false;
+}
+
 char *get_label(char *line) {
 	char* label;
 
@@ -16,17 +27,22 @@ char *get_label(char *line) {
 }
 
 char *get_entry_label(char *line_ptr){
-	char *s;
+    char *ret;
+	char *s = (char *) calloc(LINE_MAX_SIZE, sizeof(char)); /* Running ptr */
+
+    ret = s;	/* ret hold the beginning address of s */
 
 	/* Jump to the next word */
-	while ( !isspace(*line_ptr++) ){} /* Move to next whitespace */
-	while ( isspace(*line_ptr++) ){} /* Move to next char */
+	while ( !isspace(*line_ptr) ) /* Move to next whitespace */
+        line_ptr++;
+	while ( isspace(*line_ptr) ) /* Move to next char */
+        line_ptr++;
 
 	/* Copy the next word */
 	while ( !isspace(*line_ptr) )
 		*s++ = *line_ptr++;
 
-	return s;
+	return ret;
 }
 
 char *trim_label(char *line){
@@ -92,9 +108,9 @@ int get_label_addr(LabelsTable *tbl_ptr, char *name, int frame_no){
     if (lbl == NULL)
         return -1; /* TODO: label doesn't exist */
 
-	/* If the label is external, add it to the external files */
+	/* If the label is external, return 0 */
 	if (lbl->is_external){
-		dump_external_label(lbl, frame_no);
+		return 0;
 	}
 
     return lbl->value;

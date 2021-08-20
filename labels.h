@@ -19,6 +19,9 @@ typedef struct LabelsTable{
 	struct LabelsTable *next;
 } LabelsTable;
 
+/* Return true if the line contains a label */
+bool contain_label(char *line_ptr);
+
 /*
  * Return the label in a line
  */

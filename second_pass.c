@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 #include "encoder.h"
 #include "second_pass.h"
@@ -22,6 +23,9 @@ void second_pass(char *fname, LabelsTable *labels_table_ptr, char *of, int dc_of
     int ic, dc;
 
     BITMAP_32 *bitmap;
+
+    int processed_data; /* Counter to how many data cells were processed, data is dumped at 4 */
+    BITMAP_32 *data_bitmap; /* Hold the next data bitmap to be dumped */
 
     /* Init variables */
     ic = 100;
@@ -46,14 +50,23 @@ void second_pass(char *fname, LabelsTable *labels_table_ptr, char *of, int dc_of
 
         /* If it's an entry instruction - mark the symbol as entry */
         if (is_entry_instruction(line_ptr)){
-            label = get_entry_label(line_ptr); /* TODO - Maya */
+            label = get_entry_label(line_ptr);
             mark_label_as_entry(labels_table_ptr, label);
             continue;
         }
 
+        /* If the line is a labelled line, skip the label */
+        if (contain_label(line_ptr)){
+            /* Skip the label itself */
+            while (*line_ptr++ != ':'){}
+            /* Skip the whitespaces after the label */
+            while ( isspace(*line_ptr) )
+                line_ptr++;
+        }
+
         /* If it's a data instruction, add the data to the memory */
         if (is_instruction(line_ptr)){
-            tmp_dump_data_instruction(line_ptr, dc); /* TODO - Big one */
+            tmp_dump_data_instruction(line_ptr, dc, data_bitmap); /* TODO - Big one */
             dc += get_required_cells(line_ptr);
             continue;
         }
@@ -66,7 +79,7 @@ void second_pass(char *fname, LabelsTable *labels_table_ptr, char *of, int dc_of
         ic += 4;
 
         /* Add the bitmap to the file */
-        dump_bitmap(bitmap, of, ic); /* TODO - Maya */
+        dump_bitmap(bitmap, of, ic);
     }
 
     /* Merge the temporary file to the output file */

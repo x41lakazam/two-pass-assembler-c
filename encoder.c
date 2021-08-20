@@ -1,9 +1,11 @@
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "encoder.h"
 #include "labels.h"
 #include "globals.h"
 #include "math.h"
+#include "instructions.h"
 
 #define TMP_DATA_MMAP_FILE "tmp_data_mmap.ob"
 #define TMP_ENTRIES_MMAP_FILE "tmp_entries_mmap.ob"
@@ -88,20 +90,79 @@ void dump_bitmap(BITMAP_32 *bitmap, char *fname, int line_no) {
     fclose(fp);
 }
 
-void tmp_dump_data_instruction(char *line_ptr, int addr){
-	/* TODO */
+/*
+ *
+ * :param cell_count: (int) Number of cells filled by data instruction, everytime this number reach 4,
+ * dump the line.
+ */
+void tmp_dump_data_instruction(char *line_ptr, int data_frame_no, BITMAP_32 *data_bitmap){
+    /* char *token; /1* Used for strtok *1/ */
+    /* char *instruction_name; /1* Name of the data instruction *1/ */
+    /* int size; /1* Size of the encoded word in bits *1/ */
+    /* int shift; /1* Shift in the bits of the bitmap *1/ */
+
+    /* /1* Skip the operation name *1/ */
+    /* while ( !isspace(*line_ptr++) ) {} */
+
+    /* /1* Skip every trailing whitespace (even if there shouldn't be) *1/ */
+    /* while ( isspace(*line_ptr) ) */
+    /*     line_ptr++; */
+
+	/* instruction_name = get_instruction(line_ptr); */
+	/* if (STREQ(instruction_name, ".asciz")){ */
+    /*     /1* Encode every character between the quotes and dump them *1/ */
+
+    /*     /1* Go to the quote *1/ */
+    /*     while (*line_ptr++ != '"') {} */
+
+    /*     /1* Parse until the closing quote *1/ */
+    /*     while (*line_ptr != '"'){ */
+    /*         /1* Encode the character to the bitmap *1/ */
+
+    /*     } */
+    /* } */
+    /* else{ */
+    /*     /1* Encode every number  *1/ */
+    /* } */
+
+
 }
 
+/* void encode_char_to_bitmap(BITMAP_32 *bitmap, char c, int shift){ */
+/*     int i; */
+/*     int bit; */
+
+/*     for (i = 7; i >= 0; --i) */
+/*     { */
+/*         if (c & (1 << i)) */
+/*             SetBit(*bitmap, shift+i); */
+/*     } */
+/* } */
+
+BITMAP_32 *encode_data_instruction(char *line_ptr, LabelsTable *labels_tbl_ptr, int frame_no);
 char *get_entries_outfile(char *filename);
 char *get_externals_outfile(char *filename);
 char *get_basename(char *filename);
-void dump_entry_labels(LabelsTable *labels_tbl_ptr, char *outfile);
-void tmp_dump_external_labels(LabelsTable *labels_table_ptr, int frame_no);
+
+void tmp_dump_external_label(char *lbl_name, LabelsTable *labels_table_ptr, int frame_no){
+    FILE *fp;
+    Label *lbl;
+
+    lbl = get_label_by_name(labels_table_ptr, lbl_name);
+
+    if (lbl == NULL)
+        return; /* TODO raise error */
+
+    fp = fopen(TMP_EXTERNALS_MMAP_FILE, "a");
+
+    fprintf(fp, "%s %04d", lbl->label, frame_no);
+
+    fclose(fp);
+}
 
 void tmp_dump_entry_labels(LabelsTable *labels_tbl_ptr){
     Label *lbl;
     FILE *fp;
-    char *entries_filename;
 
     fp = fopen(TMP_ENTRIES_MMAP_FILE, "w");
 
@@ -122,29 +183,30 @@ void tmp_dump_entry_labels(LabelsTable *labels_tbl_ptr){
 }
 
 void merge_tmp_data_file(char *dst_fname){
-    char *line_ptr;
+    char c;
     int read_cnt;
-    size_t line_len;
     FILE *src_fp, *dst_fp;
-
-    line_len = 30;
-    line_ptr = (char *) calloc(line_len, sizeof(char));
 
     src_fp = fopen(TMP_DATA_MMAP_FILE, "r");
     dst_fp = fopen(dst_fname, "a");
 
-    while ((read_cnt = getline(&line_ptr, &line_len, src_fp))){
-        fprintf(dst_fp, line_ptr); /* TODO */
-    }
+    while ((c = fgetc(src_fp)) != EOF)
+        fputc(c, dst_fp);
 
     fclose(src_fp);
     fclose(dst_fp);
-
-    delete_tmp_data_file();
 }
 
-void delete_tmp_data_file(){
-    /* TODO */
+void create_tmp_files(){
+    fopen(TMP_DATA_MMAP_FILE, "w");
+    fopen(TMP_ENTRIES_MMAP_FILE, "w");
+    fopen(TMP_EXTERNALS_MMAP_FILE, "w");
+}
+
+void delete_tmp_files(){
+    remove(TMP_DATA_MMAP_FILE);
+    remove(TMP_ENTRIES_MMAP_FILE);
+    remove(TMP_EXTERNALS_MMAP_FILE);
 }
 
 void get_cmd_name(char *line_ptr, char *buf){
@@ -314,6 +376,9 @@ BITMAP_32 *encode_instruction_line(char *line_ptr, LabelsTable *labels_table_ptr
 			else {
                 /* Set addr to be the address the label points on */
                 addr = get_label_addr(labels_table_ptr, params, frame_no);
+                if (addr == 0)
+                    tmp_dump_external_label(params, labels_table_ptr, frame_no);
+
             }
 
             /* Build final bitmap */

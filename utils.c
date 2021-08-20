@@ -17,7 +17,6 @@ char *trim_whitespaces(char *s){
     return s;
 }
 
-
 /*
  * Clean a string:
  * remove trailing whitespaces/unwanted chars
@@ -35,8 +34,34 @@ char *clean_str(char *s){
 
     i = j = 0;
 
-    /* Remove extra whitespaces and linebreak */
+	/* If the string contain a label, remove every whitespace until the operation name */
+	if ( strchr(s, ':') != NULL){
+		/* Go to the colon and ignore every whitespace */
+		while(s[i] != ':'){
+			if (s[i] != ' ')
+				clean_s[j++] = s[i];
+			i++;
+		}
+		i++; /* Skip the colon itself */
+		/* Remove every whitespace until the operation */
+		while (isspace(s[i])){
+			i++;
+		}
+	}
+
+    /* Remove extra whitespaces (keep only the first one) and linebreak */
     while (s[i]){
+
+		/* If the char is a double quote, add everything until the corresponding quote */
+		if (s[i] == '"'){
+
+			clean_s[j++] = s[i++]; /* Add the first quote */
+
+			while (s[i] != '"')
+				clean_s[j++] = s[i++]; /* Add the text in between */
+
+			clean_s[j++] = s[i++]; /* Add the second quote */
+		}
 
         /* If the char is a whitespace:
          * if it's the first one then add it, else ignore it */
