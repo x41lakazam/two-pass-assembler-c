@@ -95,49 +95,80 @@ void dump_bitmap(BITMAP_32 *bitmap, char *fname, int line_no) {
  * :param cell_count: (int) Number of cells filled by data instruction, everytime this number reach 4,
  * dump the line.
  */
-void tmp_dump_data_instruction(char *line_ptr, int data_frame_no, BITMAP_32 *data_bitmap){
-    /* char *token; /1* Used for strtok *1/ */
-    /* char *instruction_name; /1* Name of the data instruction *1/ */
-    /* int size; /1* Size of the encoded word in bits *1/ */
-    /* int shift; /1* Shift in the bits of the bitmap *1/ */
+void tmp_dump_data_instruction(char *line_ptr, int *data_frame_no, BITMAP_32 *data_bitmap){
+    char *token; /* Used for strtok */
+    char *instruction_name; /* Name of the data instruction */
+    char *params; /* Parameters of the lines */
+    int size; /* Size of the encoded word in bits */
+    int shift; /* Shift in the bits of the bitmap */
 
-    /* /1* Skip the operation name *1/ */
-    /* while ( !isspace(*line_ptr++) ) {} */
+	params = (char *) calloc(LINE_MAX_SIZE, sizeof(char));
+	strcpy(params, line_ptr + strlen(instruction_name));
+	params = trim_whitespaces(params);
 
-    /* /1* Skip every trailing whitespace (even if there shouldn't be) *1/ */
-    /* while ( isspace(*line_ptr) ) */
-    /*     line_ptr++; */
+    /* Skip the operation name */
+    while ( !isspace(*line_ptr++) ) {}
 
-	/* instruction_name = get_instruction(line_ptr); */
-	/* if (STREQ(instruction_name, ".asciz")){ */
-    /*     /1* Encode every character between the quotes and dump them *1/ */
+    /* Skip every trailing whitespace (even if there shouldn't be) */
+    while ( isspace(*line_ptr) )
+        line_ptr++;
 
-    /*     /1* Go to the quote *1/ */
-    /*     while (*line_ptr++ != '"') {} */
+	instruction_name = get_instruction(line_ptr);
+    if (STREQ(instruction_name, ".asciz")){
+        /* Encode every character between the quotes and dump them */
 
-    /*     /1* Parse until the closing quote *1/ */
-    /*     while (*line_ptr != '"'){ */
-    /*         /1* Encode the character to the bitmap *1/ */
+        /* Go to the quote */
+        while (*line_ptr++ != '"') {}
 
-    /*     } */
-    /* } */
-    /* else{ */
-    /*     /1* Encode every number  *1/ */
-    /* } */
+        /* Parse until the closing quote */
+        while (*line_ptr != '"'){
+
+            /* calculate the shift of the bits in the map given the data frame index */
+            shift = (*data_frame_no % 4) * 8 ;
+
+            /* Encode the character to the bitmap */
+            add_obj_to_bitmap( *line_ptr, &shift, 8, data_bitmap);
+
+            /* Check if this was the last word in the bitmap (for example if frame_no is 103),
+             * in this case dump it */
+            if (*data_frame_no % 4 == 3)
+                dump_bitmap(data_bitmap, TMP_DATA_MMAP_FILE, (*data_frame_no-3));
+
+            /* Move line_ptr and add one to data_frame_no */
+            line_ptr++;
+            (*data_frame_no)++;
+        }
+    }
+    else{
+        /* Encode every number  */
+        if (STREQ(instruction_name, ".db"))
+            size = 1;
+        else if (STREQ(instruction_name, ".dh"))
+            size = 2;
+        else /* instruction is .dw*/
+            size = 4;
+
+		token = strtok(params, ",");
+		while (token)
+		{
+            /* calculate the shift of the bits in the map given the data frame index */
+            shift = (*data_frame_no % 4) * 8 ;
+
+            /* Encode the number in the right size in the bitmap */
+            add_obj_to_bitmap(atoi(token), &shift, size, data_bitmap);
+
+            /* Check if this was the last word in the bitmap (for example if frame_no is 103),
+             * in this case dump it */
+            if (*data_frame_no % 4 == 3)
+                dump_bitmap(data_bitmap, TMP_DATA_MMAP_FILE, (*data_frame_no-3));
+
+            (*data_frame_no) += size;
+			token = strtok(NULL, ",");
+		}
+    }
 
 
 }
-
-/* void encode_char_to_bitmap(BITMAP_32 *bitmap, char c, int shift){ */
-/*     int i; */
-/*     int bit; */
-
-/*     for (i = 7; i >= 0; --i) */
-/*     { */
-/*         if (c & (1 << i)) */
-/*             SetBit(*bitmap, shift+i); */
-/*     } */
-/* } */
 
 BITMAP_32 *encode_data_instruction(char *line_ptr, LabelsTable *labels_tbl_ptr, int frame_no);
 char *get_entries_outfile(char *filename);
