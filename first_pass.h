@@ -3,6 +3,6 @@
 
 #include <stdbool.h>
 
-void first_pass(char *fname, char *of);
+void first_pass(char *fname);
 
 #endif

@@ -166,9 +166,6 @@ char *char_to_bin(char c){
 }
 
 BITMAP_32 *encode_data_instruction(char *line_ptr, LabelsTable *labels_tbl_ptr, int frame_no);
-char *get_entries_outfile(char *filename);
-char *get_externals_outfile(char *filename);
-char *get_basename(char *filename);
 
 void tmp_dump_external_label(char *lbl_name, LabelsTable *labels_table_ptr, int frame_no){
     FILE *fp;

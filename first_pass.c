@@ -23,7 +23,7 @@ typedef struct Flags{
 /*
  * Perform first pass on a file
  */
-void first_pass(char *fname, char *of){
+void first_pass(char *fname){
     /* TODO CREATE labels_table */
     Flags flags; /*  */
 
@@ -122,5 +122,5 @@ void first_pass(char *fname, char *of){
 	fclose(fp);
 
     /* Start second pass */
-    second_pass(fname, labels_table, of, ic);
+    second_pass(fname, labels_table, ic);
 }

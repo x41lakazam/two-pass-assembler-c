@@ -8,6 +8,10 @@
 #include <ctype.h>
 #include "globals.h"
 
+char *get_basename(char *fname){
+    return strtok(fname, ".");
+}
+
 /*
  * Remove every leading whitespace
  */

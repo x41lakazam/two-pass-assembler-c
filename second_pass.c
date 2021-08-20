@@ -9,7 +9,7 @@
 #include "utils.h"
 #include "globals.h"
 
-void second_pass(char *fname, LabelsTable *labels_table_ptr, char *of, int dc_offset){
+void second_pass(char *fname, LabelsTable *labels_table_ptr, int dc_offset){
 	FILE *fp;
     char *line_ptr;
 
@@ -21,6 +21,11 @@ void second_pass(char *fname, LabelsTable *labels_table_ptr, char *of, int dc_of
     char *tmp_file; /* Temporary file to store data lines */
 
     int ic, dc;
+
+	char *file_basename; /* Base name of the processed file */
+    char *main_of; /* main output file */
+    char *entries_of; /* entries output file */
+    char *external_of; /* externals output file */
 
     BITMAP_32 *bitmap;
 
@@ -40,9 +45,28 @@ void second_pass(char *fname, LabelsTable *labels_table_ptr, char *of, int dc_of
         return;
     }
 
-    /* Create output file */
-    fopen(of, "w");
+    /* Create output files */
+	file_basename = get_basename(fname);
 
+    /* Main output file is file basename with .ob at the end */
+    main_of = (char *) calloc(strlen(file_basename)+4, sizeof(char));
+    strcpy(main_of, file_basename);
+    strcat(main_of, ".ob");
+
+    /* Entries output file is file basename with .ent at the end */
+    entries_of = (char *) calloc(strlen(file_basename)+5, sizeof(char));
+    strcpy(entries_of, file_basename);
+    strcat(entries_of, ".ent");
+
+    /* External output file is file basename with .ext at the end */
+    external_of = (char *) calloc(strlen(file_basename)+5, sizeof(char));
+    strcpy(external_of, file_basename);
+    strcat(external_of, ".ext");
+
+    /* Create the files */
+    fopen(main_of, "w");
+    fopen(entries_of, "w");
+    fopen(external_of, "w");
     create_tmp_files();
 
 	while ((read_cnt = getline(&line_ptr, &line_len, fp)) != -1) {
@@ -84,7 +108,7 @@ void second_pass(char *fname, LabelsTable *labels_table_ptr, char *of, int dc_of
         ic += 4;
 
         /* Add the bitmap to the file */
-        dump_bitmap(bitmap, of, ic);
+        dump_bitmap(bitmap, main_of, ic);
     }
 
     /* Merge the temporary file to the output file */
