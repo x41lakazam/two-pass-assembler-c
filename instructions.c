@@ -110,7 +110,6 @@ int get_required_cells(char *line_ptr) {
 
 	if (STREQ(instruction_name, ".asciz"))
 	{
-        /* Warning: strlen also count double quotes and ending whitespaces */
 		counter += strlen(instruction_params) - 2;/* not counting the double quotes */
         counter += 1; /* Add the \0 char */
 	}
