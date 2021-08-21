@@ -77,6 +77,10 @@ void second_pass(char *fname, LabelsTable *labels_table_ptr, int dc_offset){
         if (!relevant_line(line_ptr))
             continue;
 
+		/* If it's an external instruction, ignore it */
+		if (is_external_instruction(line_ptr))
+			continue;
+
         /* If it's an entry instruction - mark the symbol as entry */
         if (is_entry_instruction(line_ptr)){
             label = get_entry_label(line_ptr);
@@ -96,7 +100,6 @@ void second_pass(char *fname, LabelsTable *labels_table_ptr, int dc_offset){
         /* If it's a data instruction, add the data to the memory */
         if (is_instruction(line_ptr)){
             tmp_dump_data_instruction(line_ptr);
-            dc += get_required_cells(line_ptr);
             continue;
         }
 
@@ -105,14 +108,15 @@ void second_pass(char *fname, LabelsTable *labels_table_ptr, int dc_offset){
         /* Encode the line to binary */
         bitmap = encode_instruction_line(line_ptr, labels_table_ptr, ic);
 
-        ic += 4;
-
         /* Add the bitmap to the file */
-        dump_bitmap(bitmap, main_of, ic);
+        dump_bitmap(bitmap, main_of, ic, 4);
+
+        /* Increment instruction counter */
+        ic += 4;
     }
 
-    /* Merge the temporary file to the output file */
-    merge_tmp_data_file();
+    /* Merge the temporary data file to the output file */
+    merge_tmp_data_file(main_of, dc_offset);
 
 	fclose(fp);
     delete_tmp_files();

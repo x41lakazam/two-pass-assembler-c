@@ -70,7 +70,8 @@ delete_tmp_files	encoder.c	/^void delete_tmp_files(){$/;"	f	typeref:typename:voi
 dump_bitmap	encoder.c	/^void dump_bitmap(BITMAP_32 *bitmap, char *fname, int line_no) {$/;"	f	typeref:typename:void
 encode_instruction_line	encoder.c	/^BITMAP_32 *encode_instruction_line(char *line_ptr, LabelsTable *labels_table_ptr, int frame_no){$/;"	f	typeref:typename:BITMAP_32 *
 external	globals.h	/^	external = 1$/;"	e	enum:label_tags
-first_pass	first_pass.c	/^void first_pass(char *fname, char *of){$/;"	f	typeref:typename:void
+first_pass	first_pass.c	/^void first_pass(char *fname){$/;"	f	typeref:typename:void
+get_basename	utils.c	/^char *get_basename(char *fname){$/;"	f	typeref:typename:char *
 get_cmd_name	encoder.c	/^void get_cmd_name(char *line_ptr, char *buf){$/;"	f	typeref:typename:void
 get_entry_label	labels.c	/^char *get_entry_label(char *line_ptr){$/;"	f	typeref:typename:char *
 get_instruction	instructions.c	/^char *get_instruction(char *line_ptr){$/;"	f	typeref:typename:char *
@@ -114,7 +115,7 @@ parse_external_var_name	instructions.c	/^char *parse_external_var_name(char *lin
 print_bitmap_32	encoder.c	/^void print_bitmap_32(BITMAP_32 *bitmap){$/;"	f	typeref:typename:void
 raise_error	errors.c	/^void raise_error(char* msg)$/;"	f	typeref:typename:void
 relevant_line	instructions.c	/^bool relevant_line(char *s){$/;"	f	typeref:typename:bool
-second_pass	second_pass.c	/^void second_pass(char *fname, LabelsTable *labels_table_ptr, char *of, int dc_offset){$/;"	f	typeref:typename:void
+second_pass	second_pass.c	/^void second_pass(char *fname, LabelsTable *labels_table_ptr, int dc_offset){$/;"	f	typeref:typename:void
 starts_with	utils.c	/^bool starts_with(char *s, char *t){$/;"	f	typeref:typename:bool
 tags	linked_list.c	/^    int tags;$/;"	m	struct:Node	typeref:typename:int	file:
 tmp_dump_data_instruction	encoder.c	/^void tmp_dump_data_instruction(char *line_ptr){$/;"	f	typeref:typename:void

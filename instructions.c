@@ -80,9 +80,8 @@ bool is_entry_instruction(char *line_ptr) {
 bool is_external_instruction(char *line_ptr) {
 	char* external = ".extern";
 	if (strstr(line_ptr, external))
-	{
 		return true;
-	}
+
 	return false;
 }
 

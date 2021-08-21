@@ -24,7 +24,6 @@ typedef struct Flags{
  * Perform first pass on a file
  */
 void first_pass(char *fname){
-    /* TODO CREATE labels_table */
     Flags flags; /*  */
 
 	FILE *fp; /* File pointer */
@@ -61,7 +60,7 @@ void first_pass(char *fname){
         flags.has_label = flags.is_instruction = 0;
 
         /* remove every leading whitespaces */
-        line_ptr = trim_whitespaces(line_ptr);
+        line_ptr = clean_str(line_ptr);
 
         /* Ignore every irrelevant line (comments/empty...) */
         if (!relevant_line(line_ptr))

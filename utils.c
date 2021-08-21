@@ -46,7 +46,7 @@ char *clean_str(char *s){
 				clean_s[j++] = s[i];
 			i++;
 		}
-		i++; /* Skip the colon itself */
+		clean_s[j++] = s[i++]; /* Add the colon */
 		/* Remove every whitespace until the operation */
 		while (isspace(s[i])){
 			i++;

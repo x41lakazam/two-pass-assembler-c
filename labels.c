@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <ctype.h>
+#include "errors.h"
 #include "globals.h"
 #include "labels.h"
 #include "utils.h"
@@ -39,7 +40,7 @@ char *get_entry_label(char *line_ptr){
         line_ptr++;
 
 	/* Copy the next word */
-	while ( !isspace(*line_ptr) )
+	while ( *line_ptr && !isspace(*line_ptr) )
 		*s++ = *line_ptr++;
 
 	return ret;
@@ -106,7 +107,7 @@ int get_label_addr(LabelsTable *tbl_ptr, char *name, int frame_no){
     Label *lbl;
     lbl = get_label_by_name(tbl_ptr, name);
     if (lbl == NULL)
-        return -1; /* TODO: label doesn't exist */
+        raise_error("Label doesn't exist");
 
 	/* If the label is external, return 0 */
 	if (lbl->is_external){
