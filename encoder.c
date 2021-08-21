@@ -471,7 +471,7 @@ BITMAP_32 *encode_instruction_line(char *line_ptr, LabelsTable *labels_table_ptr
 				addr = 0;
 
 			/* Else if - Command is jmp and the argument is a register */
-			else if (STREQ(cmd_name, "jmp") && strchr(params, '$')){
+			else if (*params == '$' && STREQ(cmd_name, "jmp")){
                 is_reg = 1;					/* Turn the register flag on */
                 addr = atoi(params + 1);    /* Parse the value of the register index */
             }

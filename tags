@@ -9,7 +9,7 @@
 !_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
 !_TAG_PROGRAM_URL	https://ctags.io/	/official site/
 !_TAG_PROGRAM_VERSION	5.9.0	/p5.9.20210110.0/
-BITMAP_32	encoder.h	/^typedef int BITMAP_32[4];$/;"	t	typeref:typename:int[4]
+BITMAP_32	encoder.h	/^typedef int BITMAP_32[1];$/;"	t	typeref:typename:int[1]
 COMMENT_CHAR	globals.h	/^#define COMMENT_CHAR /;"	d
 ClearBit	encoder.h	/^#define ClearBit(/;"	d
 ENCODER_H	encoder.h	/^#define ENCODER_H$/;"	d
@@ -58,7 +58,6 @@ add_obj_to_bitmap	encoder.c	/^void add_obj_to_bitmap(int obj, int *start_ix, int
 build_I_instruction	encoder.c	/^BITMAP_32 *build_I_instruction(int opcode, int rs, int rt, int immed) {$/;"	f	typeref:typename:BITMAP_32 *
 build_J_instruction	encoder.c	/^BITMAP_32 *build_J_instruction(int opcode, int is_reg, int addr) {$/;"	f	typeref:typename:BITMAP_32 *
 build_R_instruction	encoder.c	/^BITMAP_32 *build_R_instruction(int opcode, int rs, int rt, int rd, int funct_no) {$/;"	f	typeref:typename:BITMAP_32 *
-char_to_bin	encoder.c	/^char *char_to_bin(char c){$/;"	f	typeref:typename:char *
 check_number_of_args	errors.c	/^bool check_number_of_args(char* cmd, char* args)$/;"	f	typeref:typename:bool
 clean_str	utils.c	/^char *clean_str(char *s){$/;"	f	typeref:typename:char *
 colon_without_label	errors.c	/^bool colon_without_label(char* line_ptr)$/;"	f	typeref:typename:bool
@@ -67,13 +66,14 @@ create_label	labels.c	/^Label *create_label(LabelsTable *tbl_ptr, int addr, char
 create_tmp_files	encoder.c	/^void create_tmp_files(){$/;"	f	typeref:typename:void
 data	linked_list.c	/^    int data;$/;"	m	struct:Node	typeref:typename:int	file:
 delete_tmp_files	encoder.c	/^void delete_tmp_files(){$/;"	f	typeref:typename:void
-dump_bitmap	encoder.c	/^void dump_bitmap(BITMAP_32 *bitmap, char *fname, int line_no) {$/;"	f	typeref:typename:void
+dump_bitmap	encoder.c	/^void dump_bitmap(BITMAP_32 *bitmap, char *fname, int line_no, int bytes_to_dump) {$/;"	f	typeref:typename:void
 encode_instruction_line	encoder.c	/^BITMAP_32 *encode_instruction_line(char *line_ptr, LabelsTable *labels_table_ptr, int frame_no){$/;"	f	typeref:typename:BITMAP_32 *
 external	globals.h	/^	external = 1$/;"	e	enum:label_tags
 first_pass	first_pass.c	/^void first_pass(char *fname){$/;"	f	typeref:typename:void
 get_basename	utils.c	/^char *get_basename(char *fname){$/;"	f	typeref:typename:char *
 get_cmd_name	encoder.c	/^void get_cmd_name(char *line_ptr, char *buf){$/;"	f	typeref:typename:void
 get_entry_label	labels.c	/^char *get_entry_label(char *line_ptr){$/;"	f	typeref:typename:char *
+get_function_id	encoder.c	/^int get_function_id(char *cmd_name){$/;"	f	typeref:typename:int
 get_instruction	instructions.c	/^char *get_instruction(char *line_ptr){$/;"	f	typeref:typename:char *
 get_instruction_group	encoder.c	/^InstructionsGroup get_instruction_group(char *cmd_name){$/;"	f	typeref:typename:InstructionsGroup
 get_label	labels.c	/^char *get_label(char *line) {$/;"	f	typeref:typename:char *
@@ -106,7 +106,7 @@ label_tags	globals.h	/^typedef enum label_tags{$/;"	g
 label_tags	globals.h	/^} label_tags;$/;"	t	typeref:enum:label_tags
 main	main.c	/^int main(int argc, char* argv[])$/;"	f	typeref:typename:int
 mark_label_as_entry	labels.c	/^void mark_label_as_entry(LabelsTable *tbl, char *name){$/;"	f	typeref:typename:void
-merge_tmp_data_file	encoder.c	/^void merge_tmp_data_file(char *dst_fname){$/;"	f	typeref:typename:void
+merge_tmp_data_file	encoder.c	/^void merge_tmp_data_file(char *dst_fname, int dc_offset){$/;"	f	typeref:typename:void
 next	labels.h	/^	struct LabelsTable *next;$/;"	m	struct:LabelsTable	typeref:struct:LabelsTable *
 next	linked_list.c	/^    struct Node *next;$/;"	m	struct:Node	typeref:struct:Node *	file:
 node_create	linked_list.c	/^struct Node *node_create(int key, int data, int tags){$/;"	f	typeref:struct:Node *
@@ -115,6 +115,7 @@ parse_external_var_name	instructions.c	/^char *parse_external_var_name(char *lin
 print_bitmap_32	encoder.c	/^void print_bitmap_32(BITMAP_32 *bitmap){$/;"	f	typeref:typename:void
 raise_error	errors.c	/^void raise_error(char* msg)$/;"	f	typeref:typename:void
 relevant_line	instructions.c	/^bool relevant_line(char *s){$/;"	f	typeref:typename:bool
+reset_bitmap	encoder.c	/^void reset_bitmap(BITMAP_32 *bitmap){$/;"	f	typeref:typename:void
 second_pass	second_pass.c	/^void second_pass(char *fname, LabelsTable *labels_table_ptr, int dc_offset){$/;"	f	typeref:typename:void
 starts_with	utils.c	/^bool starts_with(char *s, char *t){$/;"	f	typeref:typename:bool
 tags	linked_list.c	/^    int tags;$/;"	m	struct:Node	typeref:typename:int	file:
