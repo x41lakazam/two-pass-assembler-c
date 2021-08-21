@@ -118,6 +118,12 @@ void second_pass(char *fname, LabelsTable *labels_table_ptr, int dc_offset){
     /* Merge the temporary data file to the output file */
     merge_tmp_data_file(main_of, dc_offset);
 
+    /* Create entries file */
+    dump_entry_labels(labels_table_ptr, entries_of);
+
+    /* Create external file */
+    rename_externals_file(external_of);
+
 	fclose(fp);
-    delete_tmp_files();
+    /* delete_tmp_files(); */
 }

@@ -52,6 +52,57 @@ char J_cmds[4][5] = {
 	"stop"
 };
 
+void reverse_dump_bitmap(BITMAP_32 *bitmap, char *fname, int line_no, int bytes_to_dump) {
+	int i, j, k;
+    int bit, bytes_dumped;
+    unsigned int as_int;
+    FILE *fp;
+    int sentence[4];
+
+    k = j = as_int = bytes_dumped = 0;
+    fp = fopen(fname, "a");
+
+    if (fp == NULL)
+        raise_error("File doesn't exist");
+
+    fprintf(fp, "%04d ", line_no);
+
+    for (i = (bytes_to_dump*8)-1; i >= 0; i--){
+        bit = TestBit(*bitmap, i);
+
+        /* Add this bit to the integer */
+        if (bit)
+            as_int += (int) pow(2, j);
+
+        j++;
+
+        /* Every 8 bits: convert the decimal value to hexadecimal and print it in the file */
+        if (j == 8){
+            sentence[k++] = as_int;
+
+            /* Reset j and as_int */
+            j = as_int = 0;
+        }
+    }
+
+    printf("\nBytes to dump: %d\n", bytes_to_dump);
+    /* Print the sentence */
+    for (i=bytes_to_dump-1; i >= 0 ; i--){
+        printf("Dumping %d,", i);
+
+        /* Dump the hex value */
+        fprintf(fp, "%02X", sentence[i]);
+
+        /* Add a space if it's not the last byte */
+        if (i>0)
+            fprintf(fp, " ");
+    }
+
+    printf("\n");
+    fprintf(fp, "\n");
+    fclose(fp);
+}
+
 void dump_bitmap(BITMAP_32 *bitmap, char *fname, int line_no, int bytes_to_dump) {
 	int i, j;
     int bit, bytes_dumped;
@@ -105,9 +156,11 @@ void tmp_dump_data_instruction(char *line_ptr){
     char *token; /* Used for strtok */
     char *instruction_name; /* Name of the data instruction */
     char *params; /* Parameters of the lines */
+    int byte[8];
+    int byte_ix;
     int size; /* Size of the encoded word in bits */
     int shift; /* Shift in the bits of the bitmap */
-    int i, val; /* Temporary variables */
+    int i, j, val; /* Temporary variables */
     FILE *fp;
 
 	instruction_name = get_instruction(line_ptr);
@@ -133,11 +186,17 @@ void tmp_dump_data_instruction(char *line_ptr){
 
         /* Parse until the closing quote */
         while (*line_ptr != '"'){
-            for(i = 7; i >= 0; i-- )
+            printf("Dumping %c (%02X): ", *line_ptr, *line_ptr);
+            for(i = 7; i >= 0; i-- ){
                 fprintf(fp, "%d", ( *line_ptr >> i ) & 1 ? 1 : 0 );
+                printf("%d", ( *line_ptr >> i ) & 1 ? 1 : 0);
+            }
+            printf("\n");
 
             line_ptr++;
         }
+        /* Add the \0 character */
+        fprintf(fp, "00000000");
     }
     else{
         /* Encode every number  */
@@ -153,8 +212,22 @@ void tmp_dump_data_instruction(char *line_ptr){
 		{
             val = atoi(token);
 
-            for(i = size-1; i >= 0; i-- )
-                fprintf(fp, "%d", ( val >> i ) & 1 ? 1 : 0 );
+            /* We need to reverse the bytes so that the last byte appear first */
+            byte_ix = 0;
+
+            printf("Dumping %d: ", val);
+            for(i = 0; i <= size-1; i++ ){
+                byte[byte_ix++] = ((val >> i) & 1);
+
+                if (byte_ix == 8){
+                    byte_ix = 0;
+                    for (j=7; j >= 0; j--) {/* Put them in Little endian format in the file */
+                        fprintf(fp, "%d", byte[j]);
+                        printf("%d", byte[j]);
+                    }
+	        	}
+	        }
+            printf("\n");
 
 			token = strtok(NULL, ",");
 		}
@@ -175,16 +248,16 @@ void tmp_dump_external_label(char *lbl_name, LabelsTable *labels_table_ptr, int 
 
     fp = fopen(TMP_EXTERNALS_MMAP_FILE, "a");
 
-    fprintf(fp, "%s %04d", lbl->label, frame_no);
+    fprintf(fp, "%s %04d\n", lbl->label, frame_no);
 
     fclose(fp);
 }
 
-void tmp_dump_entry_labels(LabelsTable *labels_tbl_ptr){
+void dump_entry_labels(LabelsTable *labels_tbl_ptr, char *of){
     Label *lbl;
     FILE *fp;
 
-    fp = fopen(TMP_ENTRIES_MMAP_FILE, "w");
+    fp = fopen(of, "w");
 
     /* Iterate over each label and print the label in the file if it's an entry */
     while (labels_tbl_ptr != NULL){
@@ -202,10 +275,9 @@ void tmp_dump_entry_labels(LabelsTable *labels_tbl_ptr){
     fclose(fp);
 }
 
-/*
- * Clear every bit in a bitmap
- */
-void reset_bitmap(BITMAP_32 *bitmap);
+void rename_externals_file(char *new_filename){
+    rename(TMP_EXTERNALS_MMAP_FILE, new_filename);
+}
 
 void reset_bitmap(BITMAP_32 *bitmap){
     int i;
@@ -236,7 +308,7 @@ void merge_tmp_data_file(char *dst_fname, int dc_offset){
 
         /* Every 32 bits, dump the current bitmap and reset everything */
         if (i == 32){
-            dump_bitmap(bitmap, dst_fname, frame_no, 4);
+            reverse_dump_bitmap(bitmap, dst_fname, frame_no, 4);
             frame_no += 4;
             reset_bitmap(bitmap);
             i=0;
@@ -245,7 +317,7 @@ void merge_tmp_data_file(char *dst_fname, int dc_offset){
 
     /* Dump the remaining bits */
     if (i != 0)
-        dump_bitmap(bitmap, dst_fname, frame_no, 4);
+        reverse_dump_bitmap(bitmap, dst_fname, frame_no, (i%8)+1);
 
 }
 
@@ -443,13 +515,16 @@ BITMAP_32 *encode_instruction_line(char *line_ptr, LabelsTable *labels_table_ptr
             token = strtok(NULL, ",");
             rt = atoi(token+1);
 
-            /* Parse third register only if opcode is 0, else set it to 0 */
+            /* if opcode is 0, parse the third register*/
+            /* Else set rd to be the second register and rt to be 0 */
             if (opcode == 0){
                 token = strtok(NULL, ",");
                 rd = atoi(token+1);
             }
-            else
-                rd = 0;
+            else{
+                rd = rt;
+                rt = 0;
+            }
 
             /* Build final bitmap */
             bitmap = build_R_instruction(opcode, rs, rt, rd, funct_no);

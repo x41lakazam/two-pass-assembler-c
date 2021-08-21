@@ -106,8 +106,10 @@ Label *get_label_by_name(LabelsTable *tbl_ptr, char *name){
 int get_label_addr(LabelsTable *tbl_ptr, char *name, int frame_no){
     Label *lbl;
     lbl = get_label_by_name(tbl_ptr, name);
-    if (lbl == NULL)
-        raise_error("Label doesn't exist");
+    if (lbl == NULL){
+        printf("Label %s doesn't exist\n", name);
+        raise_error(NULL);
+    }
 
 	/* If the label is external, return 0 */
 	if (lbl->is_external){

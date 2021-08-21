@@ -7,7 +7,7 @@
 #define ClearBit(A,k)   ( A[(k/32)] &= ~(1 << (k%32)) )
 #define TestBit(A,k)    ( A[(k/32)] & (1 << (k%32)) )
 
-typedef int BITMAP_32[1];
+typedef int BITMAP_32[2];
 
 /*
  * Instructions groups - R, I and J
@@ -74,4 +74,24 @@ void add_obj_to_bitmap(int obj, int *start_ix, int size, BITMAP_32 *bitmap);
  */
 int get_function_id(char *cmd_name);
 
+/*
+ * Print the content of a bitmap
+ */
+void print_bitmap_32(BITMAP_32 *bitmap);
+
+void reverse_dump_bitmap(BITMAP_32 *bitmap, char *fname, int line_no, int bytes_to_dump);
+
+void dump_entry_labels(LabelsTable *labels_tbl_ptr, char *of);
+
+/*
+ * Rename the temporary file containing the external labels into
+ * a persistent one, with the right name.
+ * :param external_of: Filename of the file containing the external labels
+ */
+void rename_externals_file(char *external_of);
+
+/*
+ * Clear every bit in a bitmap
+ */
+void reset_bitmap(BITMAP_32 *bitmap);
 #endif

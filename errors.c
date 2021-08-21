@@ -4,7 +4,9 @@
 
 void raise_error(char* msg)
 {
-	printf("%s\n", msg);
+    if (msg != NULL)
+        printf("%s\n", msg);
+    printf("Exiting with code 1.");
 	exit(1);
 }
 
