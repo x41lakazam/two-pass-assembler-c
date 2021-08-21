@@ -91,6 +91,16 @@ true if there are no comma-related error and false if not.
 */
 bool validate_commas(char* line_ptr);
 
+/*
+This method checks if a specific word is a reserved word. It's used to check label names
+and valiedate them.
+Args:
+word - the word to check.
+Return:
+True if the word is a keyword and false if not.
+*/
+bool is_reserved_word(char* word); 
+
 
 
 

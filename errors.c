@@ -83,3 +83,7 @@ bool validate_commas(char* line_ptr)
 {
 }
 
+bool is_reserved_word(char* word)
+{
+}
+
