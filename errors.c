@@ -1,30 +1,31 @@
+#include <stdlib.h>
 #include "errors.h"
+#include "globals.h"
 
-void print_msg(int line_num, char* msg) 
+void raise_error(char* msg)
 {
-	printf("error in line %d: %s\n", line_num, msg);
+	printf("%s\n", msg);
 	exit(1);
 }
 
 bool validate_cmd_length(char* line_ptr)
 {
-	if (strlen(line_ptr) <= MAX_CMD_LENGTH)
-	{	
-		return true; 
-	}
+	if (strlen(line_ptr) <= LINE_MAX_SIZE)
+		return true;
+
 	return false;
 }
 
 bool is_command_exists(char* cmd)
 {
-	
+
 }
 
-bool open_qoutes(char* line_ptr)
+bool open_quotes(char* line_ptr)
 {
-	int quotes_counter = 0; /* count the qoutes in the line */ 
+	int quotes_counter = 0; /* count the qoutes in the line */
 
-	char* currentChar = line_cpy; /* initialize the current char pointer */ 
+	char* currentChar = line_ptr; /* initialize the current char pointer */
 
 	char quote = '"';
 
@@ -35,8 +36,8 @@ bool open_qoutes(char* line_ptr)
 			quotes_counter++;
 		}
 	}
-	
-	/* if the number of qoutes in the line is even then all qoutes are closed */
+
+	/* if the number of quotes in the line is even then all quotes are closed */
 	if (quotes_counter % 2 != 0)
 	{
 		return true;
@@ -50,16 +51,16 @@ bool is_register_exists(int reg_num)
 	{
 		return true;
 	}
-	return false; 
+	return false;
 }
 
 bool colon_without_label(char* line_ptr)
 {
 	char* colon_ptr = strchr(line_ptr, ':'); /* pointer to the first occurence of ':' in the line */
-	
+
 	if (colon_ptr == line_ptr) /* the first character is ':' */
 	{
-		return true; 
+		return true;
 	}
 
 	return false;
@@ -68,18 +69,18 @@ bool colon_without_label(char* line_ptr)
 bool check_number_of_args(char* cmd, char* args)
 {
 
-} 
+}
 
-bool is_value_in_range(int value, int start, int end) 
+bool is_value_in_range(int value, int start, int end)
 {
 	if (value >= start && value <= end)
 	{
-		return true; 
+		return true;
 	}
 	return false;
-} 
+}
 
-bool validate_commas(char* line_ptr) 
+bool validate_commas(char* line_ptr)
 {
 }
 

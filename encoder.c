@@ -1,9 +1,13 @@
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
+#include "errors.h"
+#include "utils.h"
 #include "encoder.h"
 #include "labels.h"
 #include "globals.h"
-#include "math.h"
+#include "instructions.h"
 
 #define TMP_DATA_MMAP_FILE "tmp_data_mmap.ob"
 #define TMP_ENTRIES_MMAP_FILE "tmp_entries_mmap.ob"
@@ -48,18 +52,21 @@ char J_cmds[4][5] = {
 	"stop"
 };
 
-void dump_bitmap(BITMAP_32 *bitmap, char *fname, int line_no) {
+void dump_bitmap(BITMAP_32 *bitmap, char *fname, int line_no, int bytes_to_dump) {
 	int i, j;
-    int bit;
+    int bit, bytes_dumped;
     unsigned int as_int;
     FILE *fp;
 
-    j = as_int = 0;
+    j = as_int = bytes_dumped = 0;
     fp = fopen(fname, "a");
+
+    if (fp == NULL)
+        raise_error("File doesn't exist");
 
     fprintf(fp, "%04d ", line_no);
 
-    for (i = 32; i >= 1; i--){
+    for (i = 31; i >= 0; i--){
         bit = TestBit(*bitmap, i);
 
         /* Add this bit to the integer */
@@ -79,29 +86,103 @@ void dump_bitmap(BITMAP_32 *bitmap, char *fname, int line_no) {
 
             /* Reset j and as_int */
             j = as_int = 0;
+
+            if (bytes_dumped == bytes_to_dump)
+                break;
         }
-
-
     }
 
     fprintf(fp, "\n");
     fclose(fp);
 }
 
-void tmp_dump_data_instruction(char *line_ptr, int addr){
-	/* TODO */
+/*
+ *
+ * :param cell_count: (int) Number of cells filled by data instruction, everytime this number reach 4,
+ * dump the line.
+ */
+void tmp_dump_data_instruction(char *line_ptr){
+    char *token; /* Used for strtok */
+    char *instruction_name; /* Name of the data instruction */
+    char *params; /* Parameters of the lines */
+    int size; /* Size of the encoded word in bits */
+    int shift; /* Shift in the bits of the bitmap */
+    int i, val; /* Temporary variables */
+    FILE *fp;
+
+	instruction_name = get_instruction(line_ptr);
+
+	params = (char *) calloc(LINE_MAX_SIZE, sizeof(char));
+	strcpy(params, line_ptr + strlen(instruction_name));
+	params = trim_whitespaces(params);
+
+    /* Skip the operation name */
+    while ( !isspace(*line_ptr++) ) {}
+
+    /* Skip every trailing whitespace (even if there shouldn't be) */
+    while ( isspace(*line_ptr) )
+        line_ptr++;
+
+    fp = fopen(TMP_DATA_MMAP_FILE, "a");
+
+    if (STREQ(instruction_name, ".asciz")){
+        /* Encode every character between the quotes and dump them */
+
+        /* Go to the quote */
+        while (*line_ptr++ != '"') {}
+
+        /* Parse until the closing quote */
+        while (*line_ptr != '"'){
+            for(i = 7; i >= 0; i-- )
+                fprintf(fp, "%d", ( *line_ptr >> i ) & 1 ? 1 : 0 );
+
+            line_ptr++;
+        }
+    }
+    else{
+        /* Encode every number  */
+        if (STREQ(instruction_name, ".db"))
+            size = 8;
+        else if (STREQ(instruction_name, ".dh"))
+            size = 16;
+        else /* instruction is .dw*/
+            size = 32;
+
+		token = strtok(params, ",");
+		while (token)
+		{
+            val = atoi(token);
+
+            for(i = size-1; i >= 0; i-- )
+                fprintf(fp, "%d", ( val >> i ) & 1 ? 1 : 0 );
+
+			token = strtok(NULL, ",");
+		}
+    }
+
+    fclose(fp);
+
 }
 
-char *get_entries_outfile(char *filename);
-char *get_externals_outfile(char *filename);
-char *get_basename(char *filename);
-void dump_entry_labels(LabelsTable *labels_tbl_ptr, char *outfile);
-void tmp_dump_external_labels(LabelsTable *labels_table_ptr, int frame_no);
+void tmp_dump_external_label(char *lbl_name, LabelsTable *labels_table_ptr, int frame_no){
+    FILE *fp;
+    Label *lbl;
+
+    lbl = get_label_by_name(labels_table_ptr, lbl_name);
+
+    if (lbl == NULL)
+        return; /* TODO raise error */
+
+    fp = fopen(TMP_EXTERNALS_MMAP_FILE, "a");
+
+    fprintf(fp, "%s %04d", lbl->label, frame_no);
+
+    fclose(fp);
+}
 
 void tmp_dump_entry_labels(LabelsTable *labels_tbl_ptr){
     Label *lbl;
     FILE *fp;
-    char *entries_filename;
 
     fp = fopen(TMP_ENTRIES_MMAP_FILE, "w");
 
@@ -121,37 +202,72 @@ void tmp_dump_entry_labels(LabelsTable *labels_tbl_ptr){
     fclose(fp);
 }
 
-void merge_tmp_data_file(char *dst_fname){
-    char *line_ptr;
-    int read_cnt;
-    size_t line_len;
-    FILE *src_fp, *dst_fp;
+/*
+ * Clear every bit in a bitmap
+ */
+void reset_bitmap(BITMAP_32 *bitmap);
 
-    line_len = 30;
-    line_ptr = (char *) calloc(line_len, sizeof(char));
-
-    src_fp = fopen(TMP_DATA_MMAP_FILE, "r");
-    dst_fp = fopen(dst_fname, "a");
-
-    while ((read_cnt = getline(&line_ptr, &line_len, src_fp))){
-        fprintf(dst_fp, line_ptr); /* TODO */
-    }
-
-    fclose(src_fp);
-    fclose(dst_fp);
-
-    delete_tmp_data_file();
+void reset_bitmap(BITMAP_32 *bitmap){
+    int i;
+    /* Iterate over the 31 bits and clear each one of them */
+    for (i=0; i <= 31; i++)
+        ClearBit(*bitmap, i);
 }
 
-void delete_tmp_data_file(){
-    /* TODO */
+void merge_tmp_data_file(char *dst_fname, int dc_offset){
+    BITMAP_32 *bitmap; /* Hold the bitmap to dump */
+    int frame_no; /* Hold the current line number */
+    char c; /* Hold   */
+    int i;
+    FILE *fp;
+
+    bitmap = (BITMAP_32 *) calloc(1, sizeof(BITMAP_32));
+
+    frame_no = dc_offset;
+
+    fp = fopen(TMP_DATA_MMAP_FILE, "r");
+
+    i=0;
+    while ( (c = fgetc(fp)) != EOF){
+        if (c == '1')
+            SetBit(*bitmap, i);
+
+        i++;
+
+        /* Every 32 bits, dump the current bitmap and reset everything */
+        if (i == 32){
+            dump_bitmap(bitmap, dst_fname, frame_no, 4);
+            frame_no += 4;
+            reset_bitmap(bitmap);
+            i=0;
+        }
+    }
+
+    /* Dump the remaining bits */
+    if (i != 0)
+        dump_bitmap(bitmap, dst_fname, frame_no, 4);
+
+}
+
+void create_tmp_files(){
+    fopen(TMP_DATA_MMAP_FILE, "w");
+    fopen(TMP_ENTRIES_MMAP_FILE, "w");
+    fopen(TMP_EXTERNALS_MMAP_FILE, "w");
+}
+
+void delete_tmp_files(){
+    remove(TMP_DATA_MMAP_FILE);
+    remove(TMP_ENTRIES_MMAP_FILE);
+    remove(TMP_EXTERNALS_MMAP_FILE);
 }
 
 void get_cmd_name(char *line_ptr, char *buf){
     int i = 0;
 
-    while (i < 4 && *line_ptr != ' ')
+    while (i < 4 && *line_ptr != ' '){
         *buf++ = *line_ptr++;
+        i++;
+    }
 }
 
 InstructionsGroup get_instruction_group(char *cmd_name){
@@ -171,7 +287,52 @@ InstructionsGroup get_instruction_group(char *cmd_name){
 }
 
 int get_opcode(char *cmd_name){
-	return 0; /* TODO */
+    if (STREQ(cmd_name, "add") ||
+        STREQ(cmd_name, "sub") ||
+        STREQ(cmd_name, "and") ||
+        STREQ(cmd_name, "or")  ||
+        STREQ(cmd_name, "nor"))
+        return 0;
+    else if (STREQ(cmd_name, "move") ||
+             STREQ(cmd_name, "mvhi") ||
+             STREQ(cmd_name, "mvlo"))
+        return 1;
+    else if (STREQ(cmd_name, "addi")) return 10;
+    else if (STREQ(cmd_name, "subi")) return 11;
+    else if (STREQ(cmd_name, "andi")) return 12;
+    else if (STREQ(cmd_name, "ori")) return 13;
+    else if (STREQ(cmd_name, "nori")) return 14;
+    else if (STREQ(cmd_name, "bne")) return 15;
+    else if (STREQ(cmd_name, "beq")) return 16;
+    else if (STREQ(cmd_name, "blt")) return 17;
+    else if (STREQ(cmd_name, "bgt")) return 18;
+    else if (STREQ(cmd_name, "lb")) return 19;
+    else if (STREQ(cmd_name, "sb")) return 20;
+    else if (STREQ(cmd_name, "lw")) return 21;
+    else if (STREQ(cmd_name, "sw")) return 22;
+    else if (STREQ(cmd_name, "lh")) return 23;
+    else if (STREQ(cmd_name, "sh")) return 24;
+    else if (STREQ(cmd_name, "jmp")) return 30;
+    else if (STREQ(cmd_name, "la")) return 31;
+    else if (STREQ(cmd_name, "call")) return 32;
+    else if (STREQ(cmd_name, "stop")) return 63;
+
+    raise_error("Command doesn't exist");
+    return -1;
+}
+
+int get_function_id(char *cmd_name){
+    if (STREQ(cmd_name, "add")) return 1;
+    else if (STREQ(cmd_name, "sub")) return 2;
+    else if (STREQ(cmd_name, "and")) return 3;
+    else if (STREQ(cmd_name, "or")) return 4;
+    else if (STREQ(cmd_name, "nor")) return 5;
+    else if (STREQ(cmd_name, "move")) return 1;
+    else if (STREQ(cmd_name, "mvhi")) return 2;
+    else if (STREQ(cmd_name, "mvlo")) return 3;
+
+    raise_error("Command doesn't exist");
+    return -1;
 }
 
 int get_label_addr_dist(char *lbl_name, LabelsTable *labels_tbl_ptr, int frame_addr){
@@ -266,21 +427,26 @@ BITMAP_32 *encode_instruction_line(char *line_ptr, LabelsTable *labels_table_ptr
 		 * R group:
 		 * Every command with opcode 0 need 3 arguments, while commands
 		 * with opcode 1 only need 2.
+         * if (is_external_instruction(line_ptr))
+         * continue;
+         *
 		 */
         case R:
+            /* Get function number required by R group instructions */
+            funct_no = get_function_id(cmd_name);
 
             /* Parse first register */
             token = strtok(params, ",");
-            rs = atoi(token) + 1;
+            rs = atoi(token+1);
 
             /* Parse second register */
             token = strtok(NULL, ",");
-            rt = atoi(token) + 1;
+            rt = atoi(token+1);
 
             /* Parse third register only if opcode is 0, else set it to 0 */
             if (opcode == 0){
                 token = strtok(NULL, ",");
-                rd = atoi(token) + 1;
+                rd = atoi(token+1);
             }
             else
                 rd = 0;
@@ -314,6 +480,9 @@ BITMAP_32 *encode_instruction_line(char *line_ptr, LabelsTable *labels_table_ptr
 			else {
                 /* Set addr to be the address the label points on */
                 addr = get_label_addr(labels_table_ptr, params, frame_no);
+                if (addr == 0)
+                    tmp_dump_external_label(params, labels_table_ptr, frame_no);
+
             }
 
             /* Build final bitmap */
@@ -343,13 +512,13 @@ void add_obj_to_bitmap(int obj, int *start_ix, int size, BITMAP_32 *bitmap){
      * Compute the next bit ix, if the bit is turned on, set the corresponding
      * bit in the bitmap
      */
-    for (bit_shift = size; bit_shift >= 0; bit_shift--){
+    for (bit_shift = size-1; bit_shift >= 0; bit_shift--){
         if ( ((obj >> bit_shift) & 1) == 1 ) /* Compute the bit at this index */
             SetBit(*bitmap, *start_ix); /* Set it in the bitmap if we need to */
 
         (*start_ix)++; /* Increment index */
     }
-    (*start_ix)--;
+    /* (*start_ix)--; */
 }
 
 BITMAP_32 *build_R_instruction(int opcode, int rs, int rt, int rd, int funct_no) {

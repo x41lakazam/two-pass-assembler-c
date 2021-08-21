@@ -21,22 +21,9 @@ typedef struct Flags{
 
 
 /*
- * Return True if a string contains a label
- */
-bool contain_label(char *s){
-    while (*s){
-        if (*s++ == ':')
-            return true;
-    }
-    return false;
-}
-
-
-/*
  * Perform first pass on a file
  */
-void first_pass(char *fname, char *of){
-    /* TODO CREATE labels_table */
+void first_pass(char *fname){
     Flags flags; /*  */
 
 	FILE *fp; /* File pointer */
@@ -73,7 +60,7 @@ void first_pass(char *fname, char *of){
         flags.has_label = flags.is_instruction = 0;
 
         /* remove every leading whitespaces */
-        line_ptr = trim_whitespaces(line_ptr);
+        line_ptr = clean_str(line_ptr);
 
         /* Ignore every irrelevant line (comments/empty...) */
         if (!relevant_line(line_ptr))
@@ -134,5 +121,5 @@ void first_pass(char *fname, char *of){
 	fclose(fp);
 
     /* Start second pass */
-    second_pass(fname, labels_table, of, ic);
+    second_pass(fname, labels_table, ic);
 }

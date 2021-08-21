@@ -1,13 +1,26 @@
+#include <stdlib.h>
+#include <ctype.h>
+#include "errors.h"
 #include "globals.h"
 #include "labels.h"
 #include "utils.h"
-#include <stdlib.h>
+
+/*
+ * Return True if a string contains a label
+ */
+bool contain_label(char *s){
+    while (*s){
+        if (*s++ == ':')
+            return true;
+    }
+    return false;
+}
 
 char *get_label(char *line) {
 	char* label;
-	
+
 	/*strtok changes the string */
- 	char* line_cpy = (char *) calloc(LINE_MAX_SIZE, sizeof(char)); 
+ 	char* line_cpy = (char *) calloc(LINE_MAX_SIZE, sizeof(char));
 	strcpy(line_cpy, line);
 
 	label = strtok(line_cpy, ":"); /* parse the label */
@@ -15,8 +28,22 @@ char *get_label(char *line) {
 }
 
 char *get_entry_label(char *line_ptr){
-	/* TODO: Return second word */
-	return "DEBUG";
+    char *ret;
+	char *s = (char *) calloc(LINE_MAX_SIZE, sizeof(char)); /* Running ptr */
+
+    ret = s;	/* ret hold the beginning address of s */
+
+	/* Jump to the next word */
+	while ( !isspace(*line_ptr) ) /* Move to next whitespace */
+        line_ptr++;
+	while ( isspace(*line_ptr) ) /* Move to next char */
+        line_ptr++;
+
+	/* Copy the next word */
+	while ( *line_ptr && !isspace(*line_ptr) )
+		*s++ = *line_ptr++;
+
+	return ret;
 }
 
 char *trim_label(char *line){
@@ -80,11 +107,11 @@ int get_label_addr(LabelsTable *tbl_ptr, char *name, int frame_no){
     Label *lbl;
     lbl = get_label_by_name(tbl_ptr, name);
     if (lbl == NULL)
-        return -1; /* TODO: label doesn't exist */
+        raise_error("Label doesn't exist");
 
-	/* If the label is external, add it to the external files */
+	/* If the label is external, return 0 */
 	if (lbl->is_external){
-		dump_external_label(lbl, frame_no);
+		return 0;
 	}
 
     return lbl->value;
