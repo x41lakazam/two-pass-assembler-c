@@ -23,15 +23,6 @@ true if the line is in the allowed range of length and false if not.
 bool validate_cmd_length(char* line_ptr);
 
 /*
-This method checks if a specific command exists or not.
-Args:
-cmd - the command name to check.
-Return:
-true if the command exists and false if not.
-*/
-bool is_command_exists(char* cmd);
-
-/*
 This method checks if a specific register exists or not.
 Args:
 reg_num - the register number to check.
@@ -68,7 +59,7 @@ args - the command arguments.
 Return:
 true if the given number of args is valid and false if not.
 */
-bool check_number_of_args(char* cmd, char* args);
+bool check_number_of_args(char* line_ptr);
 
 /*
 This method checks a specific value is within a given range.
@@ -91,7 +82,16 @@ true if there are no comma-related error and false if not.
 */
 bool validate_commas(char* line_ptr);
 
-<<<<<<< HEAD
+/*
+This method checks if a specific word is a reserved word. It's used to check label names
+and valiedate them, by the opcode. if there's an opcode for the label name then it means 
+that it's a reserved word.
+Args:
+word - the word to check.
+Return:
+True if the word is a keyword and false if not.
+*/
+bool is_reserved_word(char* word); 
 
 
 
@@ -107,6 +107,6 @@ bool validate_commas(char* line_ptr);
 
 
 
-=======
+
 #endif
->>>>>>> ead3db3b4cc49cb8225fc184ff96eba1a2fc82ae
+
