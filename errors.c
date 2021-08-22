@@ -237,7 +237,7 @@ bool validate_label(char *lbl_name, int line_no){
 
 	/* Check that the label contain only alphanumeric characters */
 	while (lbl_name[i]){
-		if ( !isalpha(lbl_name[i++]) ){
+		if ( !isalnum(lbl_name[i++]) ){
             printf("Error on line %d: Bad Label <%s>, labels can contain only alphanumeric characters\n", line_no, lbl_name);
 			return false;
         }

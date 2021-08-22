@@ -1,2 +1,2 @@
 ./compile.sh
-./a.out test_file.as
+./a.out test_file.as test_file2.as
