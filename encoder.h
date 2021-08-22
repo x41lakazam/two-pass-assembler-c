@@ -10,16 +10,6 @@
 typedef int BITMAP_32[2];
 
 /*
- * Instructions groups - R, I and J
- */
-typedef enum {
-	I,
-	J,
-	R
-} InstructionsGroup;
-
-
-/*
  * Append 4 bytes in file
  * The last byte in the bitmap is the first to be printed
  * Args:
@@ -115,46 +105,6 @@ void create_tmp_files();
  */
 void delete_tmp_files();
 
-/*
- * Parse the command name in an instruction line and put it in <buf>
- *
- * Args:
- * line_ptr - The instruction line string
- * buf - Buffer where the command name will be written
- */
-void get_cmd_name(char *line_ptr, char *buf);
-
-/*
- * Return the instruction group of a command
- *
- * Args:
- * cmd - The command name
- *
- * Return:
- * The instruction group associated with <cmd>
- */
-InstructionsGroup get_instruction_group(char *cmd);
-
-/*
- * Return the opcode associated with a command
- * Args:
- * cmd - The command
- *
- * Return:
- * The opcode of <cmd>
- */
-int get_opcode(char *cmd);
-
-/*
- * Return the function id of an instruction (required by instructions of group R)
- *
- * Args:
- * cmd_name - Name of the instruction (should be of group R)
- *
- * Return:
- * function id associated with <cmd_name>
- */
-int get_function_id(char *cmd_name);
 
 /*
  * Return the difference between a label's address and the current frame index

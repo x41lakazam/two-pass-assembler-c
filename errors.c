@@ -3,6 +3,7 @@
 #include "errors.h"
 #include "globals.h"
 #include "encoder.h"
+#include "instructions.h"
 
 void raise_error(char* msg)
 {

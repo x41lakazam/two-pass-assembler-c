@@ -9,8 +9,50 @@
 #include <stdio.h>
 #include "utils.h"
 #include "globals.h"
+#include "errors.h"
+#include "instructions.h"
 
 #define MAX_CMD_LENGTH 80
+
+/* Create arrays that contain the commands by groups */
+int R_cmds_len = 8;
+char R_cmds[8][5] = {
+	"add",
+	"sub",
+	"and",
+	"or",
+	"nor",
+	"move",
+	"mvhi",
+	"mvlo"
+};
+
+int I_cmds_len = 15;
+char I_cmds[15][5] = {
+	"addi",
+	"subi",
+	"andi",
+	"ori",
+	"nori",
+	"bne",
+	"beq",
+	"blt",
+	"bgt",
+	"lb",
+	"sb",
+	"lw",
+	"sw",
+	"lh",
+	"sh"
+};
+
+int J_cmds_len = 4;
+char J_cmds[4][5] = {
+	"jmp",
+	"la",
+	"call",
+	"stop"
+};
 
 /*
  * Instructions table
@@ -136,9 +178,6 @@ int get_required_cells(char *line_ptr) {
 	return counter;
 }
 
-/*
- * Return True if a line is relevant, meaning it's not a comment or empty
- */
 bool relevant_line(char *s){
 
     s = trim_whitespaces(s);
@@ -150,5 +189,80 @@ bool relevant_line(char *s){
         return false;
 
     return true;
+}
+
+void get_cmd_name(char *line_ptr, char *buf){
+    int i = 0;
+
+    while (i < 4 && *line_ptr != ' '){
+        *buf++ = *line_ptr++;
+        i++;
+    }
+	/*TODO - Validate command name*/
+}
+
+InstructionsGroup get_instruction_group(char *cmd_name){
+    /* Assuming cmd_name is a valid command name */
+    int i;
+
+    /* Instruction is in R group ? */
+    for (i=0; i<R_cmds_len; i++)
+        if (STREQ(R_cmds[i], cmd_name)) return R;
+
+    /* Instruction is in I group ? */
+    for (i=0; i<I_cmds_len; i++)
+        if (STREQ(I_cmds[i], cmd_name)) return I;
+
+    /* Else instruction is in J group */
+    return J;
+}
+
+int get_opcode(char *cmd_name){
+    if (STREQ(cmd_name, "add") ||
+        STREQ(cmd_name, "sub") ||
+        STREQ(cmd_name, "and") ||
+        STREQ(cmd_name, "or")  ||
+        STREQ(cmd_name, "nor")) return 0;
+    else if (STREQ(cmd_name, "move") ||
+             STREQ(cmd_name, "mvhi") ||
+             STREQ(cmd_name, "mvlo")) return 1;
+    else if (STREQ(cmd_name, "addi")) return 10;
+    else if (STREQ(cmd_name, "subi")) return 11;
+    else if (STREQ(cmd_name, "andi")) return 12;
+    else if (STREQ(cmd_name, "ori")) return 13;
+    else if (STREQ(cmd_name, "nori")) return 14;
+    else if (STREQ(cmd_name, "bne")) return 15;
+    else if (STREQ(cmd_name, "beq")) return 16;
+    else if (STREQ(cmd_name, "blt")) return 17;
+    else if (STREQ(cmd_name, "bgt")) return 18;
+    else if (STREQ(cmd_name, "lb")) return 19;
+    else if (STREQ(cmd_name, "sb")) return 20;
+    else if (STREQ(cmd_name, "lw")) return 21;
+    else if (STREQ(cmd_name, "sw")) return 22;
+    else if (STREQ(cmd_name, "lh")) return 23;
+    else if (STREQ(cmd_name, "sh")) return 24;
+    else if (STREQ(cmd_name, "jmp")) return 30;
+    else if (STREQ(cmd_name, "la")) return 31;
+    else if (STREQ(cmd_name, "call")) return 32;
+    else if (STREQ(cmd_name, "stop")) return 63;
+
+    printf("Command <%s> doesn't exist.\n", cmd_name);
+    raise_error(NULL);
+    return -1;
+}
+
+int get_function_id(char *cmd_name){
+    if (STREQ(cmd_name, "add")) return 1;
+    else if (STREQ(cmd_name, "sub")) return 2;
+    else if (STREQ(cmd_name, "and")) return 3;
+    else if (STREQ(cmd_name, "or")) return 4;
+    else if (STREQ(cmd_name, "nor")) return 5;
+    else if (STREQ(cmd_name, "move")) return 1;
+    else if (STREQ(cmd_name, "mvhi")) return 2;
+    else if (STREQ(cmd_name, "mvlo")) return 3;
+
+    printf("Command <%s> doesn't exist in R group", cmd_name);
+    raise_error(NULL);
+    return -1;
 }
 
