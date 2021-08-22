@@ -2,6 +2,10 @@
 .entry Next
 .extern wNumber
 ;This is a COMMENT !
+:add $2
+add: add $3,$5,$4
+fake $4
+add $a,$33,$1
 STR: .asciz "aBcd"
 MAIN: add $3,$5,$9
 LOOP: ori $9,$9,$2

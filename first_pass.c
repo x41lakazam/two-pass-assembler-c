@@ -46,7 +46,6 @@ void first_pass(char *fname){
 	labels_table = (LabelsTable *) calloc(1, sizeof(LabelsTable));
 
 	/* Open file */
-    check_file(fname, line_len);
 	fp = fopen(fname, "r");
 
 	/* Check if the file is valid */

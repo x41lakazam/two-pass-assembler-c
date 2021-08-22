@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
+#include "labels.h"
 
 /*
 This method prints a proper error message.
@@ -16,17 +17,8 @@ void raise_error(char* msg);
  * Check if any syntax error appear in a file
  * Args:
  * fname - Name of the file to check
- * line_len - Maximum length of a line
  */
-void check_file(char *fname, size_t line_len);
-
-/*
-This method checks if a specific register exists or not.
-Args:
-reg_num - the register number to check.
-Return: True if the register number is valid and false if not.
-*/
-bool validate_register(int reg_num);
+bool check_file(char *fname);
 
 /*
 This method checks if there are open quotes in the line.
@@ -113,5 +105,17 @@ bool validate_label(char *lbl_name, int line_no);
  * True if everything went right else false
  */
 bool check_registers(char *line_ptr, int line_no);
+
+/*
+ * Validate a data instruction
+ * Check that the numbers passed are in the right range
+ *
+ * Args:
+ * line_ptr - Line to parse
+ *
+ * Return:
+ * true if it's valid else false
+ */
+bool validate_data_instruction(char *line_ptr, int line_no);
 
 #endif

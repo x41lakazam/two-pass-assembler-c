@@ -19,13 +19,16 @@ void raise_error(char* msg)
 	exit(1);
 }
 
-void check_file(char *fname, size_t line_len){
+bool check_file(char *fname){
     FILE *fp;
     int error_raised, line_no;
 	size_t read_cnt; /* Number of character retrieved on a line */
     char *line_ptr;
     char *label = (char *) calloc(LINE_MAX_SIZE, sizeof(char));
     char *cmd;
+	size_t line_len;
+
+	line_len = LINE_MAX_SIZE;
 
     fp = fopen(fname, "r");
     if (fp == NULL){
@@ -40,6 +43,7 @@ void check_file(char *fname, size_t line_len){
 
 		cmd = (char *) calloc(CMD_MAX_SIZE, sizeof(char));
         ++line_no;
+
 
         if (!relevant_line(line_ptr))
             continue;
@@ -80,29 +84,42 @@ void check_file(char *fname, size_t line_len){
 			line_ptr = trim_label(line_ptr);
         }
 
+        /* Error 6 - Check that the data instruction is valid */
+        if (is_data_instruction(line_ptr)){
+            if (!validate_data_instruction(line_ptr, line_no)){
+                error_raised = 1;
+            }
+        }
+
         /* If it's a code instruction */
         if (is_code_instruction(line_ptr)){
             get_cmd_name(line_ptr, cmd);
-            /* Error 6 - Check that the command exists */
+            /* Error 7 - Check that the command exists */
 			if (!command_exists(cmd)){
                 printf("[x] Error on line %d: Command <%s> doesn't exist.\n", line_no, cmd);
                 error_raised = 1;
             }
 			else{
-				/* Error 7 - Check that the number of arguments match the command requirements */
-				if (!check_number_of_args(line_ptr, line_no))
+				/* Error 8 - Check that the number of arguments match the command requirements */
+				if (!check_number_of_args(line_ptr, line_no)){
 					error_raised = 1;
+                    continue;
+                }
 
-				/* Error 8 - Check that the registers name are right */
-				if (!check_registers(line_ptr, line_no))
+
+				/* Error 9 - Check that the registers name are right */
+				if (!check_registers(line_ptr, line_no)){
 					error_raised=1;
+                    continue;
+                }
+
 			}
         }
     }
     /* If any error occured, the file cannot be parsed, stop execution */
     if (error_raised == 1)
-        raise_error(NULL);
-
+		return false;
+	return true;
 }
 
 bool open_quotes(char* line_ptr)
@@ -123,13 +140,6 @@ bool open_quotes(char* line_ptr)
 
 	/* if the number of quotes in the line is even then all quotes are closed */
 	if (quotes_counter % 2 != 0)
-		return true;
-	return false;
-}
-
-bool validate_register(int reg_num)
-{
-	if (reg_num >= 0 && reg_num <= 32) /* as written in the project instructions */
 		return true;
 	return false;
 }
@@ -256,6 +266,9 @@ bool check_registers(char *line_ptr, int line_no){
     int val;
     char *token;
     char *params;
+    bool valid;
+
+    valid = true;
 
 	params = strchr(line_ptr, ' ');
 	if(params != NULL)
@@ -273,16 +286,74 @@ bool check_registers(char *line_ptr, int line_no){
                 val = atoi(token+1);
                 if (val == 0){
                     printf("[x] Error on line %d: Register %s is invalid (it should be a number between 0 and 31)\n", line_no, token);
-                    return false;
+                    valid = false;
                 }
             }
 
             if ( val < 0 || val > 31){
                 printf("[x] Error on line %d: Register %s is not in range (should be between 0 and 31)\n", line_no, token);
-                return false;
+                valid = false;
             }
         }
 		token = strtok(NULL, ",");
     }
-    return true;
+    return valid;
 }
+
+
+bool validate_data_instruction(char *line_ptr, int line_no){
+    char *token; /* Used for strtok */
+    char *instruction_name; /* Name of the data instruction */
+    char *params; /* Parameters of the lines */
+    int size; /* Size of the encoded word in bits */
+    int val; /* Temporary variable */
+    int max_val; /* Hold the maximum value of a data point */
+    int valid;
+
+    valid = true;
+
+	instruction_name = get_instruction(line_ptr);
+
+	params = (char *) calloc(LINE_MAX_SIZE, sizeof(char));
+	strcpy(params, line_ptr + strlen(instruction_name));
+	params = trim_whitespaces(params);
+
+    /* Skip the operation name */
+    while ( !isspace(*line_ptr++) ) {}
+
+    /* Skip every trailing whitespace (even if there shouldn't be) */
+    while ( isspace(*line_ptr) )
+        line_ptr++;
+
+    if (!(STREQ(instruction_name, ".asciz"))){
+        /* Encode every number  */
+        if (STREQ(instruction_name, ".db")){
+            size = 8;
+            max_val = 127;
+        }
+        else if (STREQ(instruction_name, ".dh")){
+            size = 16;
+            max_val = 32767;
+        }
+        else{ /* instruction is .dw*/
+            size = 32;
+            max_val = 2147483647;
+        }
+
+		token = strtok(params, ",");
+		while (token)
+		{
+            val = atoi(token);
+            if (val < -(max_val+1) || val > max_val){
+                printf("[x] Error on line %d: value %d is too big for %s command (%d bits)\n", line_no, val, instruction_name, size);
+                valid = false;
+            }
+
+			token = strtok(NULL, ",");
+		}
+    }
+
+    return valid;
+
+}
+
