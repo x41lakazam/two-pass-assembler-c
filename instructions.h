@@ -131,4 +131,10 @@ int get_opcode(char *cmd);
  */
 int get_function_id(char *cmd_name);
 
+/*
+ * Check if an instruction is a code instruction.
+ * Actually check if a lineis not all the other types of lines
+ */
+bool is_code_instruction(char *line_ptr);
+
 #endif

@@ -194,11 +194,10 @@ bool relevant_line(char *s){
 void get_cmd_name(char *line_ptr, char *buf){
     int i = 0;
 
-    while (i < 4 && *line_ptr != ' '){
+    while (i < CMD_MAX_SIZE && *line_ptr != ' '){
         *buf++ = *line_ptr++;
         i++;
     }
-	/*TODO - Validate command name*/
 }
 
 InstructionsGroup get_instruction_group(char *cmd_name){
@@ -246,8 +245,6 @@ int get_opcode(char *cmd_name){
     else if (STREQ(cmd_name, "call")) return 32;
     else if (STREQ(cmd_name, "stop")) return 63;
 
-    printf("Command <%s> doesn't exist.\n", cmd_name);
-    raise_error(NULL);
     return -1;
 }
 
@@ -261,8 +258,16 @@ int get_function_id(char *cmd_name){
     else if (STREQ(cmd_name, "mvhi")) return 2;
     else if (STREQ(cmd_name, "mvlo")) return 3;
 
-    printf("Command <%s> doesn't exist in R group", cmd_name);
-    raise_error(NULL);
     return -1;
+}
+
+bool is_code_instruction(char *line_ptr){
+	if (relevant_line(line_ptr) &&
+		!is_instruction(line_ptr) &&
+		!is_entry_instruction(line_ptr) &&
+		!is_external_instruction(line_ptr)
+	   )
+		return true;
+	return false;
 }
 

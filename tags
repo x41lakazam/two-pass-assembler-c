@@ -19,14 +19,14 @@ FIRST_PASS_H	first_pass.h	/^#define FIRST_PASS_H$/;"	d
 Flags	first_pass.c	/^typedef struct Flags{$/;"	s	file:
 Flags	first_pass.c	/^} Flags;$/;"	t	typeref:struct:Flags	file:
 GLOBALS_H	globals.h	/^#define GLOBALS_H$/;"	d
-I	encoder.h	/^	I,$/;"	e	enum:__anon3a7b951b0103
+I	instructions.h	/^	I,$/;"	e	enum:__anon255a72100103
 INSTRUCTIONS_H	instructions.h	/^#define INSTRUCTIONS_H$/;"	d
-I_cmds	encoder.c	/^char I_cmds[15][5] = {$/;"	v	typeref:typename:char[15][5]
-I_cmds_len	encoder.c	/^int I_cmds_len = 15;$/;"	v	typeref:typename:int
-InstructionsGroup	encoder.h	/^} InstructionsGroup;$/;"	t	typeref:enum:__anon3a7b951b0103
-J	encoder.h	/^	J,$/;"	e	enum:__anon3a7b951b0103
-J_cmds	encoder.c	/^char J_cmds[4][5] = {$/;"	v	typeref:typename:char[4][5]
-J_cmds_len	encoder.c	/^int J_cmds_len = 4;$/;"	v	typeref:typename:int
+I_cmds	instructions.c	/^char I_cmds[15][5] = {$/;"	v	typeref:typename:char[15][5]
+I_cmds_len	instructions.c	/^int I_cmds_len = 15;$/;"	v	typeref:typename:int
+InstructionsGroup	instructions.h	/^} InstructionsGroup;$/;"	t	typeref:enum:__anon255a72100103
+J	instructions.h	/^	J,$/;"	e	enum:__anon255a72100103
+J_cmds	instructions.c	/^char J_cmds[4][5] = {$/;"	v	typeref:typename:char[4][5]
+J_cmds_len	instructions.c	/^int J_cmds_len = 4;$/;"	v	typeref:typename:int
 LABELS_H	labels.h	/^#define LABELS_H$/;"	d
 LABEL_CHAR	labels.h	/^#define LABEL_CHAR /;"	d
 LINE_MAX_SIZE	globals.h	/^#define LINE_MAX_SIZE /;"	d
@@ -35,9 +35,9 @@ Label	labels.h	/^} Label;$/;"	t	typeref:struct:Label
 LabelsTable	labels.h	/^typedef struct LabelsTable{$/;"	s
 LabelsTable	labels.h	/^} LabelsTable;$/;"	t	typeref:struct:LabelsTable
 MAX_CMD_LENGTH	instructions.c	/^#define MAX_CMD_LENGTH /;"	d	file:
-R	encoder.h	/^	R$/;"	e	enum:__anon3a7b951b0103
-R_cmds	encoder.c	/^char R_cmds[8][5] = {$/;"	v	typeref:typename:char[8][5]
-R_cmds_len	encoder.c	/^int R_cmds_len = 8;$/;"	v	typeref:typename:int
+R	instructions.h	/^	R$/;"	e	enum:__anon255a72100103
+R_cmds	instructions.c	/^char R_cmds[8][5] = {$/;"	v	typeref:typename:char[8][5]
+R_cmds_len	instructions.c	/^int R_cmds_len = 8;$/;"	v	typeref:typename:int
 SECOND_PASS_H	second_pass.h	/^#define SECOND_PASS_H$/;"	d
 STREQ	globals.h	/^#define STREQ(/;"	d
 SetBit	encoder.h	/^#define SetBit(/;"	d
@@ -47,7 +47,7 @@ TRUE	globals.h	/^#define TRUE /;"	d
 TestBit	encoder.h	/^#define TestBit(/;"	d
 UTILS_H	utils.h	/^#define UTILS_H$/;"	d
 WHITESPACE	globals.h	/^#define WHITESPACE /;"	d
-__anon3a7b951b0103	encoder.h	/^typedef enum {$/;"	g
+__anon255a72100103	instructions.h	/^typedef enum {$/;"	g
 add_data_offset	labels.c	/^void add_data_offset(LabelsTable *tbl_ptr, int offset){$/;"	f	typeref:typename:void
 add_external_variable	labels.c	/^void add_external_variable(LabelsTable *tbl_ptr, char *label_name){$/;"	f	typeref:typename:void
 add_label_to_table	labels.c	/^void add_label_to_table(LabelsTable *tbl_ptr, Label *label){$/;"	f	typeref:typename:void
@@ -69,17 +69,17 @@ errors.o	Makefile	/^errors.o: errors.c errors.h $/;"	t
 external	globals.h	/^	external = 1$/;"	e	enum:label_tags
 first_pass	first_pass.c	/^void first_pass(char *fname){$/;"	f	typeref:typename:void
 get_basename	utils.c	/^char *get_basename(char *fname){$/;"	f	typeref:typename:char *
-get_cmd_name	encoder.c	/^void get_cmd_name(char *line_ptr, char *buf){$/;"	f	typeref:typename:void
+get_cmd_name	instructions.c	/^void get_cmd_name(char *line_ptr, char *buf){$/;"	f	typeref:typename:void
 get_entry_label	labels.c	/^char *get_entry_label(char *line_ptr){$/;"	f	typeref:typename:char *
-get_function_id	encoder.c	/^int get_function_id(char *cmd_name){$/;"	f	typeref:typename:int
+get_function_id	instructions.c	/^int get_function_id(char *cmd_name){$/;"	f	typeref:typename:int
 get_instruction	instructions.c	/^char *get_instruction(char *line_ptr){$/;"	f	typeref:typename:char *
-get_instruction_group	encoder.c	/^InstructionsGroup get_instruction_group(char *cmd_name){$/;"	f	typeref:typename:InstructionsGroup
+get_instruction_group	instructions.c	/^InstructionsGroup get_instruction_group(char *cmd_name){$/;"	f	typeref:typename:InstructionsGroup
 get_label	labels.c	/^char *get_label(char *line) {$/;"	f	typeref:typename:char *
 get_label_addr	labels.c	/^int get_label_addr(LabelsTable *tbl_ptr, char *name){$/;"	f	typeref:typename:int
 get_label_addr_dist	encoder.c	/^int get_label_addr_dist(char *lbl_name, LabelsTable *labels_tbl_ptr, int frame_addr){$/;"	f	typeref:typename:int
 get_label_by_name	labels.c	/^Label *get_label_by_name(LabelsTable *tbl_ptr, char *name){$/;"	f	typeref:typename:Label *
 get_line_wout_spaces	utils.c	/^int get_line_wout_spaces(char **buffer, size_t *size, FILE *file){$/;"	f	typeref:typename:int
-get_opcode	encoder.c	/^int get_opcode(char *cmd_name){$/;"	f	typeref:typename:int
+get_opcode	instructions.c	/^int get_opcode(char *cmd_name){$/;"	f	typeref:typename:int
 get_required_cells	instructions.c	/^int get_required_cells(char *line_ptr) {$/;"	f	typeref:typename:int
 has_label	first_pass.c	/^    unsigned int has_label : 1;$/;"	m	struct:Flags	typeref:typename:unsigned int:1	file:
 instruction.o	Makefile	/^instruction.o: instruction.c instruction.h $/;"	t

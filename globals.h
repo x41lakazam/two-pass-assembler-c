@@ -1,9 +1,13 @@
+/*
+ * Global variables and macros
+ */
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
 #define TRUE 1
 #define FALSE 0
 #define LINE_MAX_SIZE 81
+#define CMD_MAX_SIZE 4
 #define WHITESPACE ' '
 #define COMMENT_CHAR ';'
 

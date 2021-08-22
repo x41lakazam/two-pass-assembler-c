@@ -1,5 +1,7 @@
+/*
+ * First pass of the assembling, map every label to its corresponding address
+ */
 #include <stdio.h>
-
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
@@ -28,19 +30,16 @@ void first_pass(char *fname){
 	FILE *fp; /* File pointer */
 	char *line_ptr; /* Line holder buffer */
 	size_t line_len; /* Max Length of a line in a file */
-	ssize_t read_cnt; /* Number of character retrieved on a line */
+	size_t read_cnt; /* Number of character retrieved on a line */
 
     int ic, dc; /* Instruction counter, Data counter */
-    char *label, *instruction, *var_name; /* Store temporary strings */
-
-    int error_raised;
+    char *label, *var_name; /* Store temporary strings */
 
 	LabelsTable *labels_table; /* Holds the list of labels */
 
 	/* Init variables */
     ic = 100; /* IC always start from 100 */
     dc = 0;
-    error_raised = 0;
     line_ptr = (char *) calloc(LINE_MAX_SIZE, sizeof(char));
 	line_len = LINE_MAX_SIZE;
 
@@ -83,7 +82,6 @@ void first_pass(char *fname){
          */
         if (is_instruction(line_ptr)){
             flags.is_instruction = 1; /* Mark the line as data instruction */
-            instruction = get_instruction(line_ptr); /* Parse the instruction */
 
             /* If the line contains a label, add it to the labels table */
             if (flags.has_label){

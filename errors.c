@@ -1,9 +1,15 @@
+/*
+ * Error checking functions
+ */
+
 #include <stdlib.h>
 #include <ctype.h>
+#include "utils.h"
 #include "errors.h"
 #include "globals.h"
 #include "encoder.h"
 #include "instructions.h"
+#include "labels.h"
 
 void raise_error(char* msg)
 {
@@ -15,9 +21,11 @@ void raise_error(char* msg)
 
 void check_file(char *fname, size_t line_len){
     FILE *fp;
-    int error_raised;
-	ssize_t read_cnt; /* Number of character retrieved on a line */
+    int error_raised, line_no;
+	size_t read_cnt; /* Number of character retrieved on a line */
     char *line_ptr;
+    char *label = (char *) calloc(LINE_MAX_SIZE, sizeof(char));
+    char *cmd;
 
     fp = fopen(fname, "r");
     if (fp == NULL){
@@ -25,35 +33,71 @@ void check_file(char *fname, size_t line_len){
         raise_error(NULL);
     }
 
+    error_raised = line_no = 0;
     line_ptr = (char *) calloc(LINE_MAX_SIZE, sizeof(char));
 
-	while ((read_cnt = getline(&line_ptr, &line_len, fp)) != -1) {
+	while ((read_cnt = get_line_wout_spaces(&line_ptr, &line_len, fp)) != -1) {
+
+		cmd = (char *) calloc(CMD_MAX_SIZE, sizeof(char));
+        ++line_no;
+
+        if (!relevant_line(line_ptr))
+            continue;
+
         /* Check several errors: */
 
         /* Error 1 - Line is too long */
         if (read_cnt >= LINE_MAX_SIZE){
-            printf("Line is too long (%zd chars, maximum is 80)\n", read_cnt);
+            printf("Line %d is too long (%lu chars, maximum is 80)\n", line_no, read_cnt);
             error_raised = 1;
         }
 
         /* Error 2 - Line contains open quotes */
         if (open_quotes(line_ptr)){
-            printf("Invalid syntax on line: <%s> (quote left open)\n", line_ptr);
+            printf("Invalid syntax on line %d: <%s> (quote left open)\n", line_no, line_ptr);
             error_raised = 1;
         }
 
         /* Error 3 - The line contains a colon but no label */
         if (!validate_prefix(line_ptr)){
-            printf("Invalid syntax on line: <%s> (label name is empty)\n", line_ptr);
+            printf("Invalid syntax on line %d: <%s> (label name is empty)\n", line_no, line_ptr);
+			line_ptr++; /* Skip the colon to check more errors */
             error_raised = 1;
         }
 
         /* Error 4 - double commas */
         if (!validate_commas(line_ptr)){
-            printf("Invalid syntax on line: <%s> (doubled comma)\n", line_ptr);
+            printf("Invalid syntax on line %d: <%s> (doubled comma)\n", line_no, line_ptr);
             error_raised = 1;
         }
 
+        /* Error 5 - If there is a label, check that it's not a forbidden word */
+        if (contain_label(line_ptr)){
+            label = get_label(line_ptr);
+            if (!validate_label(label, line_no))
+                error_raised = 1;
+
+			line_ptr = trim_label(line_ptr);
+        }
+
+        /* If it's a code instruction */
+        if (is_code_instruction(line_ptr)){
+            get_cmd_name(line_ptr, cmd);
+            /* Error 6 - Check that the command exists */
+			if (!command_exists(cmd)){
+                printf("Error on line %d: Command <%s> doesn't exist.\n", line_no, cmd);
+                error_raised = 1;
+            }
+			else{
+				/* Error 7 - Check that the number of arguments match the command requirements */
+				if (!check_number_of_args(line_ptr, line_no))
+					error_raised = 1;
+
+				/* Error 8 - Check that the registers name are right */
+				if (!check_registers(line_ptr, line_no))
+					error_raised=1;
+			}
+        }
     }
     /* If any error occured, the file cannot be parsed, stop execution */
     if (error_raised == 1)
@@ -97,11 +141,11 @@ bool validate_prefix(char* line_ptr)
 	return true;
 }
 
-bool check_number_of_args(char* line_ptr)
-{
+bool check_number_of_args(char* line_ptr, int line_no){
 	char* cmd; /* the command name */
 	char* args; /* the command arguments */
 	int cmd_opcode;
+	int required_args;
 	int args_counter = 0; /* count the given argumetns */
 	char* token; /* for strtok and counting the args */
 
@@ -120,30 +164,29 @@ bool check_number_of_args(char* line_ptr)
 		token = strtok(NULL, ",");
 	}
 
-	if (cmd_opcode == 0 && args_counter == 3) /* R instructions - 3 operands */
-		return true;
-	else if (cmd_opcode == 1 && args_counter == 2)/* R instructions - 2 operands */
-		return true;
-	else if (cmd_opcode >= 10 && cmd_opcode <= 24 && args_counter == 3) /* I instrcution */
-		return true;
-	else if (cmd_opcode >= 30 && cmd_opcode <= 63 && args_counter == 1) /* J instrcution */
-		return true;
-	return false;
-}
+	if (cmd_opcode == 0) /* R instructions - 3 operands */
+		required_args = 3;
+	else if (cmd_opcode == 1) /* R instructions - 2 operands */
+		required_args = 2;
+	else if (cmd_opcode >= 10 && cmd_opcode <= 24) /* I instrcution */
+		required_args = 3;
+	else if (cmd_opcode >= 30 && cmd_opcode <= 62) /* J instrcution */
+		required_args = 1;
+	else if (cmd_opcode == 63)
+		required_args = 0;
 
+	if (args_counter != required_args){
+		printf("Error on line %d: Bad number of parameters (Actual: %d, expected: %d)\n", line_no, args_counter, required_args);
+		return false;
+	}
 
-bool is_value_in_range(int value, int start, int end)
-{
-	if (value >= start && value <= end)
-		return true;
-	return false;
+	return true;
 }
 
 bool validate_commas(char* line_ptr)
 {
 	char* cmd; /* the command name */
 	char* args; /* the command arguments */
-	char* token; /* to parse the arguemnts */
 	int comma_found = 0;
 	char* current_char;
 
@@ -182,12 +225,64 @@ bool is_reserved_word(char* word)
 	return false;
 }
 
-bool validate_label(char *lbl_name){
+bool command_exists(char *cmd_name){
+    if (get_opcode(cmd_name) == -1){
+        return false;
+    }
+    return true;
+}
+
+bool validate_label(char *lbl_name, int line_no){
+    int i = 0;
+
 	/* Check that the label contain only alphanumeric characters */
-	while (*lbl_name){
-		if ( !isalpha(*lbl_name++) )
+	while (lbl_name[i]){
+		if ( !isalpha(lbl_name[i++]) ){
+            printf("Error on line %d: Bad Label <%s>, labels can contain only alphanumeric characters\n", line_no, lbl_name);
 			return false;
+        }
 	}
+
+    /* Check if the label is a reserved word */
+    if (is_reserved_word(lbl_name)){
+        printf("Error on line %d: Bad Label, <%s> is a reserved word\n", line_no, lbl_name);
+        return false;
+    }
+
 	return true;
 }
 
+bool check_registers(char *line_ptr, int line_no){
+    int val;
+    char *token;
+    char *params;
+
+	params = strchr(line_ptr, ' ');
+	if(params != NULL)
+	{
+		params = params + 1;
+	}
+
+    token = strtok(params, ",");
+
+    while (token){
+        if (*token == '$'){
+            if (*(token+1) == '0')
+                val = 0;
+            else{
+                val = atoi(token+1);
+                if (val == 0){
+                    printf("Error on line %d: Register %s is invalid (it should be a number between 0 and 31)\n", line_no, token);
+                    return false;
+                }
+            }
+
+            if ( val < 0 || val > 31){
+                printf("Error on line %d: Register %s is not in range (should be between 0 and 31)\n", line_no, token);
+                return false;
+            }
+        }
+		token = strtok(NULL, ",");
+    }
+    return true;
+}

@@ -50,23 +50,13 @@ bool validate_prefix(char* line_ptr);
 /*
 This method checks if the command has the proper number of arguments.
 Args:
-cmd - the command name.
-args - the command arguments.
+line_ptr - Line to parse
+line_no - Number of the parsed line
+
 Return:
 true if the given number of args is valid and false if not.
 */
-bool check_number_of_args(char* line_ptr);
-
-/*
-This method checks a specific value is within a given range.
-Args:
-value - the value to check.
-start - the beginning of the range.
-end - the end of the range.
-Return:
-true if the value is within the range and false if not.
-*/
-bool is_value_in_range(int value, int start, int end);
+bool check_number_of_args(char* line_ptr, int line_no);
 
 /*
 This method checks all comma-realted errors: commas at beginning or end,
@@ -88,5 +78,40 @@ Return:
 True if the word is a keyword and false if not.
 */
 bool is_reserved_word(char* word);
+
+/*
+ * Check that a command exists
+ *
+ * Args:
+ * cmd_name - Command to check
+ *
+ * Return:
+ * True if the command exists else false
+ */
+bool command_exists(char *cmd_name);
+
+/*
+ * Make validations on a label and print errors if there are any
+ *
+ * Args:
+ * lbl_name - Name of the label
+ *
+ * Return:
+ * True if the label is valid else false
+ */
+bool validate_label(char *lbl_name, int line_no);
+
+/*
+ * Check the registers on a code instruction line
+ * Check that they are numbers and in the right range
+ *
+ * Args:
+ * line_ptr - The line to parse
+ * line_no - Number of the parsed line
+ *
+ * Return
+ * True if everything went right else false
+ */
+bool check_registers(char *line_ptr, int line_no);
 
 #endif

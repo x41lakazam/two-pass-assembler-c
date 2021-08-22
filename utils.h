@@ -1,3 +1,6 @@
+/*
+ * General utilitaries functions
+ */
 #ifndef UTILS_H
 #define UTILS_H
 

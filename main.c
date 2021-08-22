@@ -16,8 +16,9 @@ int main(int argc, char* argv[])
     }
 
     /* Make first pass on every file */
-    for (i = 1; i < argc; i++)
+    for (i = 1; i < argc; i++){
         first_pass(argv[i]);
+    }
 
 	return 0;
 }

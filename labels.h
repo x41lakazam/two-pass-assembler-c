@@ -24,7 +24,6 @@ typedef struct Label{
 	unsigned int is_external: 1;
 } Label;
 
-
 /*
  * Represent a Labels Table that map the labels
  * Based on the linked list pattern

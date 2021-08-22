@@ -13,11 +13,11 @@ void second_pass(char *fname, LabelsTable *labels_table_ptr, int ic_size, int dc
 	FILE *fp, *obj_fp;
     char *line_ptr; /* Hold the line strin */
     size_t line_len; /* Maximum length of an instruction line */
-    ssize_t read_cnt; /* Counter of characters read from the file */
+    size_t read_cnt; /* Counter of characters read from the file */
 
     char *label; /* Hold the label name */
 
-    int ic, dc; /* Instruction counter & Data counter */
+    int ic; /* Instruction counter & Data counter */
 
 	char *file_basename; /* Base name of the processed file */
     char *main_of; /* main output file */
@@ -25,8 +25,6 @@ void second_pass(char *fname, LabelsTable *labels_table_ptr, int ic_size, int dc
     char *external_of; /* externals output file */
 
     BITMAP_32 *bitmap; /* 32-Bits array */
-
-    int processed_data; /* Counter to how many data cells were processed, data is dumped at 4 */
 
 	int dc_offset = ic_size;
 

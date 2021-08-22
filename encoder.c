@@ -113,7 +113,6 @@ void tmp_dump_data_instruction(char *line_ptr){
     int byte[8];
     int byte_ix;
     int size; /* Size of the encoded word in bits */
-    int shift; /* Shift in the bits of the bitmap */
     int i, j, val; /* Temporary variables */
     FILE *fp;
 
@@ -442,7 +441,6 @@ BITMAP_32 *encode_instruction_line(char *line_ptr, LabelsTable *labels_table_ptr
 
 void print_bitmap_32(BITMAP_32 *bitmap){
     int i;
-    int bit;
 
     /* For each bit, if it's on print a 1, else print a 0 */
     for (i=0; i <= 31; i++)
