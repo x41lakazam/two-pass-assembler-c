@@ -6,26 +6,62 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <stdio.h>
 #include "globals.h"
+
+int get_line_wout_spaces(char **buffer, size_t *size, FILE *file){
+    int    c;
+    size_t count;
+    int space_seen;
+    char *new_lineptr;
+
+    if (buffer == NULL)
+        return 0;
+
+    space_seen = 0;
+	count = 0;
+
+	while ((c = getc(file)) != EOF && (c != '\n')){
+		/* If c is a space */
+		if (isspace(c)){
+			/* If a space has already been seen, ignore this one */
+			if (space_seen == 1)
+				continue;
+			/* Else set space_seen to 1 */
+			space_seen = 1;
+		}
+		else
+			space_seen = 0;
+		(*buffer)[count++] = (char)c;
+
+		if (count + 1 >= *size){
+            /* Reallocate space (double the size) */
+            new_lineptr = (char *) realloc(*buffer, 2 * *size);
+            if (new_lineptr == NULL){
+                printf("Internal error: Cannot parse line, too long.\n");
+                break;
+            }
+            *buffer = new_lineptr;
+            *size *= 2;
+        }
+	}
+
+    (*buffer)[count] = '\0';
+	if (count == 0)
+		return -1;
+    return count;
+}
 
 char *get_basename(char *fname){
     return strtok(fname, ".");
 }
 
-/*
- * Remove every leading whitespace
- */
 char *trim_whitespaces(char *s){
     while (*s == WHITESPACE)
         s++;
     return s;
 }
 
-/*
- * Clean a string:
- * remove trailing whitespaces/unwanted chars
- * remove extra whitespaces
- */
 char *clean_str(char *s){
     int i, j;
     char *clean_s; /* Hold the new and clean string */
@@ -90,9 +126,6 @@ char *clean_str(char *s){
     return clean_s;
 }
 
-/*
- * Check if <s> starts with <t>
- */
 bool starts_with(char *s, char *t){
     size_t len_s, len_t;
 

@@ -152,5 +152,3 @@ bool relevant_line(char *s){
     return true;
 }
 
-
-

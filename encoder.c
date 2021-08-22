@@ -1,3 +1,7 @@
+/*
+ * Functions related to the encoding of the data and the filesystem I/O operations
+ */
+
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,9 +14,10 @@
 #include "instructions.h"
 
 #define TMP_DATA_MMAP_FILE "tmp_data_mmap.ob"
-#define TMP_ENTRIES_MMAP_FILE "tmp_entries_mmap.ob"
 #define TMP_EXTERNALS_MMAP_FILE "tmp_externals_mmap.ob"
 
+
+/* Create arrays that contain the commands by groups */
 int R_cmds_len = 8;
 char R_cmds[8][5] = {
 	"add",
@@ -52,57 +57,6 @@ char J_cmds[4][5] = {
 	"stop"
 };
 
-void reverse_dump_bitmap(BITMAP_32 *bitmap, char *fname, int line_no, int bytes_to_dump) {
-	int i, j, k;
-    int bit, bytes_dumped;
-    unsigned int as_int;
-    FILE *fp;
-    int sentence[4];
-
-    k = j = as_int = bytes_dumped = 0;
-    fp = fopen(fname, "a");
-
-    if (fp == NULL)
-        raise_error("File doesn't exist");
-
-    fprintf(fp, "%04d ", line_no);
-
-    for (i = (bytes_to_dump*8)-1; i >= 0; i--){
-        bit = TestBit(*bitmap, i);
-
-        /* Add this bit to the integer */
-        if (bit)
-            as_int += (int) pow(2, j);
-
-        j++;
-
-        /* Every 8 bits: convert the decimal value to hexadecimal and print it in the file */
-        if (j == 8){
-            sentence[k++] = as_int;
-
-            /* Reset j and as_int */
-            j = as_int = 0;
-        }
-    }
-
-    printf("\nBytes to dump: %d\n", bytes_to_dump);
-    /* Print the sentence */
-    for (i=bytes_to_dump-1; i >= 0 ; i--){
-        printf("Dumping %d,", i);
-
-        /* Dump the hex value */
-        fprintf(fp, "%02X", sentence[i]);
-
-        /* Add a space if it's not the last byte */
-        if (i>0)
-            fprintf(fp, " ");
-    }
-
-    printf("\n");
-    fprintf(fp, "\n");
-    fclose(fp);
-}
-
 void dump_bitmap(BITMAP_32 *bitmap, char *fname, int line_no, int bytes_to_dump) {
 	int i, j;
     int bit, bytes_dumped;
@@ -112,11 +66,10 @@ void dump_bitmap(BITMAP_32 *bitmap, char *fname, int line_no, int bytes_to_dump)
     j = as_int = bytes_dumped = 0;
     fp = fopen(fname, "a");
 
-    if (fp == NULL)
-        raise_error("File doesn't exist");
-
+    /* Dump the line number */
     fprintf(fp, "%04d ", line_no);
 
+    /* Dump the bits */
     for (i = 31; i >= 0; i--){
         bit = TestBit(*bitmap, i);
 
@@ -147,11 +100,53 @@ void dump_bitmap(BITMAP_32 *bitmap, char *fname, int line_no, int bytes_to_dump)
     fclose(fp);
 }
 
-/*
- *
- * :param cell_count: (int) Number of cells filled by data instruction, everytime this number reach 4,
- * dump the line.
- */
+void reverse_dump_bitmap(BITMAP_32 *bitmap, char *fname, int line_no, int bytes_to_dump) {
+    FILE *fp;
+	int i, j, k;
+    int bit;
+    unsigned int as_int; /* Temporary value used for converting a byte to integer */
+    int sentence[4]; /* Hold 4 bytes */
+
+    k = j = as_int = 0;
+    fp = fopen(fname, "a");
+
+    /* Dump the line number */
+    fprintf(fp, "%04d ", line_no);
+
+    /* Dump the bits as hexadecimal values in reverse order */
+    for (i = (bytes_to_dump*8)-1; i >= 0; i--){
+        bit = TestBit(*bitmap, i);
+
+        /* Add this bit to the integer */
+        if (bit)
+            as_int += (int) pow(2, j);
+
+        j++;
+
+        /* Every 8 bits: convert the decimal value to hexadecimal and add it to the sentence */
+        if (j == 8){
+            sentence[k++] = as_int;
+
+            /* Reset j and as_int */
+            j = as_int = 0;
+        }
+    }
+
+    /* Dump the whole sentence */
+    for (i=bytes_to_dump-1; i >= 0 ; i--){
+        /* Dump the hex value */
+        fprintf(fp, "%02X", sentence[i]);
+
+        /* Add a space if it's not the last byte */
+        if (i>0)
+            fprintf(fp, " ");
+    }
+
+    fprintf(fp, "\n");
+    fclose(fp);
+}
+
+
 void tmp_dump_data_instruction(char *line_ptr){
     char *token; /* Used for strtok */
     char *instruction_name; /* Name of the data instruction */
@@ -186,12 +181,9 @@ void tmp_dump_data_instruction(char *line_ptr){
 
         /* Parse until the closing quote */
         while (*line_ptr != '"'){
-            printf("Dumping %c (%02X): ", *line_ptr, *line_ptr);
             for(i = 7; i >= 0; i-- ){
                 fprintf(fp, "%d", ( *line_ptr >> i ) & 1 ? 1 : 0 );
-                printf("%d", ( *line_ptr >> i ) & 1 ? 1 : 0);
             }
-            printf("\n");
 
             line_ptr++;
         }
@@ -215,7 +207,6 @@ void tmp_dump_data_instruction(char *line_ptr){
             /* We need to reverse the bytes so that the last byte appear first */
             byte_ix = 0;
 
-            printf("Dumping %d: ", val);
             for(i = 0; i <= size-1; i++ ){
                 byte[byte_ix++] = ((val >> i) & 1);
 
@@ -223,11 +214,9 @@ void tmp_dump_data_instruction(char *line_ptr){
                     byte_ix = 0;
                     for (j=7; j >= 0; j--) {/* Put them in Little endian format in the file */
                         fprintf(fp, "%d", byte[j]);
-                        printf("%d", byte[j]);
                     }
 	        	}
 	        }
-            printf("\n");
 
 			token = strtok(NULL, ",");
 		}
@@ -323,14 +312,12 @@ void merge_tmp_data_file(char *dst_fname, int dc_offset){
 
 void create_tmp_files(){
     fopen(TMP_DATA_MMAP_FILE, "w");
-    fopen(TMP_ENTRIES_MMAP_FILE, "w");
     fopen(TMP_EXTERNALS_MMAP_FILE, "w");
 }
 
 void delete_tmp_files(){
     remove(TMP_DATA_MMAP_FILE);
-    remove(TMP_ENTRIES_MMAP_FILE);
-    remove(TMP_EXTERNALS_MMAP_FILE);
+    /* External tmp file is simply renamed */
 }
 
 void get_cmd_name(char *line_ptr, char *buf){
@@ -340,6 +327,7 @@ void get_cmd_name(char *line_ptr, char *buf){
         *buf++ = *line_ptr++;
         i++;
     }
+	/*TODO - Validate command name*/
 }
 
 InstructionsGroup get_instruction_group(char *cmd_name){
@@ -363,12 +351,10 @@ int get_opcode(char *cmd_name){
         STREQ(cmd_name, "sub") ||
         STREQ(cmd_name, "and") ||
         STREQ(cmd_name, "or")  ||
-        STREQ(cmd_name, "nor"))
-        return 0;
+        STREQ(cmd_name, "nor")) return 0;
     else if (STREQ(cmd_name, "move") ||
              STREQ(cmd_name, "mvhi") ||
-             STREQ(cmd_name, "mvlo"))
-        return 1;
+             STREQ(cmd_name, "mvlo")) return 1;
     else if (STREQ(cmd_name, "addi")) return 10;
     else if (STREQ(cmd_name, "subi")) return 11;
     else if (STREQ(cmd_name, "andi")) return 12;
@@ -389,7 +375,8 @@ int get_opcode(char *cmd_name){
     else if (STREQ(cmd_name, "call")) return 32;
     else if (STREQ(cmd_name, "stop")) return 63;
 
-    raise_error("Command doesn't exist");
+    printf("Command <%s> doesn't exist.\n", cmd_name);
+    raise_error(NULL);
     return -1;
 }
 
@@ -403,7 +390,8 @@ int get_function_id(char *cmd_name){
     else if (STREQ(cmd_name, "mvhi")) return 2;
     else if (STREQ(cmd_name, "mvlo")) return 3;
 
-    raise_error("Command doesn't exist");
+    printf("Command <%s> doesn't exist in R group", cmd_name);
+    raise_error(NULL);
     return -1;
 }
 
@@ -554,7 +542,7 @@ BITMAP_32 *encode_instruction_line(char *line_ptr, LabelsTable *labels_table_ptr
 			/* Else - Command is not stop and the argument is a label */
 			else {
                 /* Set addr to be the address the label points on */
-                addr = get_label_addr(labels_table_ptr, params, frame_no);
+                addr = get_label_addr(labels_table_ptr, params);
                 if (addr == 0)
                     tmp_dump_external_label(params, labels_table_ptr, frame_no);
 

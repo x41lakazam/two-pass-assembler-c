@@ -13,23 +13,20 @@ msg - the message to display.
 void raise_error(char* msg);
 
 /*
-This method checks the length of the command to make sure it's not too long -
-(more than 80 characters).
-Args:
-line_ptr - the line to check.
-Return:
-true if the line is in the allowed range of length and false if not.
-*/
-bool validate_cmd_length(char* line_ptr);
+ * Check if any syntax error appear in a file
+ * Args:
+ * fname - Name of the file to check
+ * line_len - Maximum length of a line
+ */
+void check_file(char *fname, size_t line_len);
 
 /*
 This method checks if a specific register exists or not.
 Args:
 reg_num - the register number to check.
-Return:
-true if the register number is valid and false if not.
+Return: True if the register number is valid and false if not.
 */
-bool is_register_exists(int reg_num);
+bool validate_register(int reg_num);
 
 /*
 This method checks if there are open quotes in the line.
@@ -45,11 +42,10 @@ bool open_quotes(char* line_ptr);
 This method checks a there is a colon (:) without a label in the line.
 It checks if the first character in the line is a colon.
 Args:
-line_ptr - the line to check.
-Return:
-true if a colon without a label is found and false if not.
+:param line_ptr: the line to check.
+:Return: True if the line is valid else false
 */
-bool colon_without_label(char* line_ptr);
+bool validate_prefix(char* line_ptr);
 
 /*
 This method checks if the command has the proper number of arguments.
@@ -84,29 +80,13 @@ bool validate_commas(char* line_ptr);
 
 /*
 This method checks if a specific word is a reserved word. It's used to check label names
-and valiedate them, by the opcode. if there's an opcode for the label name then it means 
+and valiedate them, by the opcode. if there's an opcode for the label name then it means
 that it's a reserved word.
 Args:
 word - the word to check.
 Return:
 True if the word is a keyword and false if not.
 */
-bool is_reserved_word(char* word); 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+bool is_reserved_word(char* word);
 
 #endif
-

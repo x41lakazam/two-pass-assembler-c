@@ -5,9 +5,6 @@
 #include "labels.h"
 #include "utils.h"
 
-/*
- * Return True if a string contains a label
- */
 bool contain_label(char *s){
     while (*s){
         if (*s++ == ':')
@@ -47,7 +44,10 @@ char *get_entry_label(char *line_ptr){
 }
 
 char *trim_label(char *line){
+	/* Move the pointer after the colon */
 	while (*line++ != LABEL_CHAR) {}
+
+	/* Remove every extra whitespaces */
 	line = trim_whitespaces(line);
 	return line;
 }
@@ -59,7 +59,6 @@ void add_label_to_table(LabelsTable *tbl_ptr, Label *label){
 	if (tbl_ptr == NULL || label == NULL)
 		return;
 
-
     /* Initialize last_node on the beginning of the table */
 	last_node = tbl_ptr;
 
@@ -70,8 +69,14 @@ void add_label_to_table(LabelsTable *tbl_ptr, Label *label){
     }
 
     /* Else if the table is not empty, go through it until the last node */
-	while (last_node->next != NULL)
+	while (last_node->next != NULL){
+		/* Check that a label with the same name doesn't already exist */
+		if (STREQ(last_node->label->label, label->label)){
+			printf("Label with name %s already exist.\n", label->label);
+			raise_error(NULL);
+		}
 		last_node = last_node->next;
+	}
 
     /* Create a new node containing the label */
 	new_node = (LabelsTable *) calloc(1, sizeof(LabelsTable));
@@ -103,7 +108,7 @@ Label *get_label_by_name(LabelsTable *tbl_ptr, char *name){
     return NULL;
 }
 
-int get_label_addr(LabelsTable *tbl_ptr, char *name, int frame_no){
+int get_label_addr(LabelsTable *tbl_ptr, char *name){
     Label *lbl;
     lbl = get_label_by_name(tbl_ptr, name);
     if (lbl == NULL){
@@ -125,9 +130,10 @@ void mark_label_as_entry(LabelsTable *tbl, char *name){
     /* Get the right label */
     label = get_label_by_name(tbl, name);
 
-    /* If label is none, then no label match this name */
-    if (!label)
-        return;
+	if (label == NULL){
+		printf("Entry %s doesn't match any label.\n", name);
+		raise_error(NULL);
+	}
 
     label->is_entry = 1;
 }

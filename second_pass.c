@@ -9,32 +9,29 @@
 #include "utils.h"
 #include "globals.h"
 
-void second_pass(char *fname, LabelsTable *labels_table_ptr, int dc_offset){
-	FILE *fp;
-    char *line_ptr;
+void second_pass(char *fname, LabelsTable *labels_table_ptr, int ic_size, int dc_size){
+	FILE *fp, *obj_fp;
+    char *line_ptr; /* Hold the line strin */
+    size_t line_len; /* Maximum length of an instruction line */
+    ssize_t read_cnt; /* Counter of characters read from the file */
 
-    size_t line_len;
-    ssize_t read_cnt;
+    char *label; /* Hold the label name */
 
-    char *label;
-
-    char *tmp_file; /* Temporary file to store data lines */
-
-    int ic, dc;
+    int ic, dc; /* Instruction counter & Data counter */
 
 	char *file_basename; /* Base name of the processed file */
     char *main_of; /* main output file */
     char *entries_of; /* entries output file */
     char *external_of; /* externals output file */
 
-    BITMAP_32 *bitmap;
+    BITMAP_32 *bitmap; /* 32-Bits array */
 
     int processed_data; /* Counter to how many data cells were processed, data is dumped at 4 */
-    BITMAP_32 *data_bitmap; /* Hold the next data bitmap to be dumped */
+
+	int dc_offset = ic_size;
 
     /* Init variables */
     ic = 100;
-    dc = 100 + dc_offset;
 	line_len = LINE_MAX_SIZE;
     line_ptr = (char *) calloc(line_len, sizeof(char));
 
@@ -64,12 +61,18 @@ void second_pass(char *fname, LabelsTable *labels_table_ptr, int dc_offset){
     strcat(external_of, ".ext");
 
     /* Create the files */
-    fopen(main_of, "w");
-    fopen(entries_of, "w");
-    fopen(external_of, "w");
-    create_tmp_files();
+	obj_fp = fopen(main_of, "w"); /* Object file */
+	fprintf(obj_fp, "%d %d\n", ic_size, dc_size); /* Write title to the object file */
+	fclose(obj_fp);
+    fopen(entries_of, "w"); /* Entries file */
+    fopen(external_of, "w"); /* Externals file */
+    create_tmp_files(); /* Temporary files */
 
-	while ((read_cnt = getline(&line_ptr, &line_len, fp)) != -1) {
+	while ((read_cnt = get_line_wout_spaces(&line_ptr, &line_len, fp)) != -1) {
+
+		/* We assume no one modified the input file between the first and the second pass */
+		/* Thus we're not checking syntax errors again */
+
         /* Clean the line (remove unwanted characters) */
         line_ptr = clean_str(line_ptr);
 
@@ -121,9 +124,10 @@ void second_pass(char *fname, LabelsTable *labels_table_ptr, int dc_offset){
     /* Create entries file */
     dump_entry_labels(labels_table_ptr, entries_of);
 
-    /* Create external file */
+    /* Create externals file */
     rename_externals_file(external_of);
 
+    /* Close input file and delete temporary ones */
 	fclose(fp);
-    /* delete_tmp_files(); */
+    delete_tmp_files();
 }

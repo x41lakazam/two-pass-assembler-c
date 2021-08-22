@@ -4,15 +4,17 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include "errors.h"
 #include "instructions.h"
 #include "utils.h"
 #include "globals.h"
 #include "labels.h"
 #include "second_pass.h"
 
-
 /*
  * Boolean flags
+ * has_label - True if the line contain a label
+ * is_instruction - True if the line is a data instruction
  */
 typedef struct Flags{
     unsigned int has_label : 1;
@@ -20,81 +22,86 @@ typedef struct Flags{
 } Flags;
 
 
-/*
- * Perform first pass on a file
- */
 void first_pass(char *fname){
-    Flags flags; /*  */
+    Flags flags;
 
 	FILE *fp; /* File pointer */
-	char *line_ptr; /* Line holder */
+	char *line_ptr; /* Line holder buffer */
 	size_t line_len; /* Max Length of a line in a file */
 	ssize_t read_cnt; /* Number of character retrieved on a line */
 
     int ic, dc; /* Instruction counter, Data counter */
     char *label, *instruction, *var_name; /* Store temporary strings */
 
-	LabelsTable *labels_table;
+    int error_raised;
+
+	LabelsTable *labels_table; /* Holds the list of labels */
 
 	/* Init variables */
-    ic = 100;
+    ic = 100; /* IC always start from 100 */
     dc = 0;
+    error_raised = 0;
     line_ptr = (char *) calloc(LINE_MAX_SIZE, sizeof(char));
 	line_len = LINE_MAX_SIZE;
 
 	labels_table = (LabelsTable *) calloc(1, sizeof(LabelsTable));
 
 	/* Open file */
+    check_file(fname, line_len);
 	fp = fopen(fname, "r");
 
 	/* Check if the file is valid */
 	if (!fp){
 		printf("Bad file: %s\n", fname);
-		return;
+        raise_error(NULL);
 	}
 
-	/* Loop - Read lines and process them */
-	while ((read_cnt = getline(&line_ptr, &line_len, fp)) != -1) {
+	/* Loop - Read lines and parse them */
+	while ((read_cnt = get_line_wout_spaces(&line_ptr, &line_len, fp)) != -1) {
 
         /* Reinitialize flags */
         flags.has_label = flags.is_instruction = 0;
 
-        /* remove every leading whitespaces */
+        /* Clean the string */
         line_ptr = clean_str(line_ptr);
 
-        /* Ignore every irrelevant line (comments/empty...) */
+        /* Ignore every irrelevant line (comments/empty/etc..) */
         if (!relevant_line(line_ptr))
             continue;
 
-        /* Handle labelled command */
+        /* If the line is labelled, mark it and parse the label, then skip it */
         if (contain_label(line_ptr)){
-            flags.has_label = 1;
-            label = get_label(line_ptr);
-            line_ptr = trim_label(line_ptr);
+            flags.has_label = 1; /* Mark the presence of the label */
+            label = get_label(line_ptr); /* Parse the label */
+            line_ptr = trim_label(line_ptr); /* Skip the label */
         }
 
-        /* Handle instruction (data storage) command */
+        /*
+         * Handle data instruction commands:
+         * Calculate how many cells this data instruction will need
+         * Label it if we need to
+         */
         if (is_instruction(line_ptr)){
-            flags.is_instruction = 1;
-            instruction = get_instruction(line_ptr);
+            flags.is_instruction = 1; /* Mark the line as data instruction */
+            instruction = get_instruction(line_ptr); /* Parse the instruction */
 
             /* If the line contains a label, add it to the labels table */
             if (flags.has_label){
                 label_data_instruction(labels_table, dc, label);
             }
 
-            /* Update DC */
+            /* Update Data Counter */
             dc += get_required_cells(line_ptr);
 
-            /* Parse next line */
+            /* Go to next line */
             continue;
         }
 
-        /* If it's a .entry instruction, stop first pass here */
+        /* If it's a .entry instruction, ignore it (We will take care of it in the 2nd pass) */
         if (is_entry_instruction(line_ptr))
             continue;
 
-        /* Handle extern instruction */
+        /* Handle external instruction */
         if (is_external_instruction(line_ptr)){
 
             /* Extract the variable name from the line */
@@ -112,7 +119,8 @@ void first_pass(char *fname){
         ic += 4;
     }
 
-    /* Because we want to put every data definition at the end
+    /*
+     * Because we want to put every data definition at the end
      * of the binary output file, add IC to every labelled data
      */
     add_data_offset(labels_table, ic);
@@ -121,5 +129,5 @@ void first_pass(char *fname){
 	fclose(fp);
 
     /* Start second pass */
-    second_pass(fname, labels_table, ic);
+    second_pass(fname, labels_table, ic-100, dc);
 }
