@@ -90,12 +90,12 @@ instructions	instructions.c	/^char *instructions[] = {$/;"	v	typeref:typename:ch
 instructions_cnt	instructions.c	/^int instructions_cnt = 4;$/;"	v	typeref:typename:int
 is_code	labels.h	/^	unsigned int is_code: 1;$/;"	m	struct:Label	typeref:typename:unsigned int:1
 is_code_instruction	instructions.c	/^bool is_code_instruction(char *line_ptr){$/;"	f	typeref:typename:bool
+is_data_instruction	first_pass.c	/^    unsigned int is_data_instruction : 1;$/;"	m	struct:Flags	typeref:typename:unsigned int:1	file:
+is_data_instruction	instructions.c	/^bool is_data_instruction(char *s){$/;"	f	typeref:typename:bool
 is_entry	labels.h	/^	unsigned int is_entry: 1;$/;"	m	struct:Label	typeref:typename:unsigned int:1
 is_entry_instruction	instructions.c	/^bool is_entry_instruction(char *line_ptr) {$/;"	f	typeref:typename:bool
 is_external	labels.h	/^	unsigned int is_external: 1;$/;"	m	struct:Label	typeref:typename:unsigned int:1
 is_external_instruction	instructions.c	/^bool is_external_instruction(char *line_ptr) {$/;"	f	typeref:typename:bool
-is_instruction	first_pass.c	/^    unsigned int is_instruction : 1;$/;"	m	struct:Flags	typeref:typename:unsigned int:1	file:
-is_instruction	instructions.c	/^bool is_instruction(char *s){$/;"	f	typeref:typename:bool
 is_reserved_word	errors.c	/^bool is_reserved_word(char* word)$/;"	f	typeref:typename:bool
 label	labels.h	/^	Label *label;$/;"	m	struct:LabelsTable	typeref:typename:Label *
 label	labels.h	/^	char label[80];$/;"	m	struct:Label	typeref:typename:char[80]

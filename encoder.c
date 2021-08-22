@@ -191,7 +191,7 @@ void tmp_dump_external_label(char *lbl_name, LabelsTable *labels_table_ptr, int 
     lbl = get_label_by_name(labels_table_ptr, lbl_name);
 
     if (lbl == NULL){
-        printf("Error on line %d, label %s doesn't exist", frame_no, lbl_name);
+        printf("[x] Error on line %d, label %s doesn't exist", frame_no, lbl_name);
         raise_error(NULL);
         return;
     }
@@ -352,7 +352,7 @@ BITMAP_32 *encode_instruction_line(char *line_ptr, LabelsTable *labels_table_ptr
 
 				/* Check if label is external */
 				if (immed == 0){
-                    printf("Error on line %d, label of an I instruction should not be external", frame_no);
+                    printf("[x] Error on line %d, label of an I instruction should not be external", frame_no);
                     raise_error(NULL);
 				}
             }

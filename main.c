@@ -23,11 +23,11 @@ int main(int argc, char* argv[])
 
     /* Process every file */
     for (i = 1; i < argc; i++){
-        printf("Processing file %s\n", argv[i]);
+        printf("[*] Processing file %s\n", argv[i]);
         first_pass(argv[i]);
     }
 
-    printf("Assembling finished.\n");
+    printf("[v] Assembling finished without errors.\n");
 
 	return 0;
 }

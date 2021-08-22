@@ -29,7 +29,7 @@ void check_file(char *fname, size_t line_len){
 
     fp = fopen(fname, "r");
     if (fp == NULL){
-		printf("Bad file: %s\n", fname);
+		printf("[x] Bad file: %s\n", fname);
         raise_error(NULL);
     }
 
@@ -48,26 +48,26 @@ void check_file(char *fname, size_t line_len){
 
         /* Error 1 - Line is too long */
         if (read_cnt >= LINE_MAX_SIZE){
-            printf("Line %d is too long (%lu chars, maximum is 80)\n", line_no, read_cnt);
+            printf("[x] Error on line %d: line too long (%lu chars, maximum is 80)\n", line_no, read_cnt);
             error_raised = 1;
         }
 
         /* Error 2 - Line contains open quotes */
         if (open_quotes(line_ptr)){
-            printf("Invalid syntax on line %d: <%s> (quote left open)\n", line_no, line_ptr);
+            printf("[x] Error on line %d: Invalid syntax - <%s> (quote left open)\n", line_no, line_ptr);
             error_raised = 1;
         }
 
         /* Error 3 - The line contains a colon but no label */
         if (!validate_prefix(line_ptr)){
-            printf("Invalid syntax on line %d: <%s> (label name is empty)\n", line_no, line_ptr);
+            printf("[x] Error on line %d: Invalid syntax - <%s> (label name is empty)\n", line_no, line_ptr);
 			line_ptr++; /* Skip the colon to check more errors */
             error_raised = 1;
         }
 
         /* Error 4 - double commas */
         if (!validate_commas(line_ptr)){
-            printf("Invalid syntax on line %d: <%s> (doubled comma)\n", line_no, line_ptr);
+            printf("[x] Error on line %d: Invalid syntax - <%s> (consecutive commas)\n", line_no, line_ptr);
             error_raised = 1;
         }
 
@@ -85,7 +85,7 @@ void check_file(char *fname, size_t line_len){
             get_cmd_name(line_ptr, cmd);
             /* Error 6 - Check that the command exists */
 			if (!command_exists(cmd)){
-                printf("Error on line %d: Command <%s> doesn't exist.\n", line_no, cmd);
+                printf("[x] Error on line %d: Command <%s> doesn't exist.\n", line_no, cmd);
                 error_raised = 1;
             }
 			else{
@@ -176,7 +176,7 @@ bool check_number_of_args(char* line_ptr, int line_no){
 		required_args = 0;
 
 	if (args_counter != required_args){
-		printf("Error on line %d: Bad number of parameters (Actual: %d, expected: %d)\n", line_no, args_counter, required_args);
+		printf("[x] Error on line %d: Bad number of parameters (Actual: %d, expected: %d)\n", line_no, args_counter, required_args);
 		return false;
 	}
 
@@ -238,14 +238,14 @@ bool validate_label(char *lbl_name, int line_no){
 	/* Check that the label contain only alphanumeric characters */
 	while (lbl_name[i]){
 		if ( !isalnum(lbl_name[i++]) ){
-            printf("Error on line %d: Bad Label <%s>, labels can contain only alphanumeric characters\n", line_no, lbl_name);
+            printf("[x] Error on line %d: Bad Label <%s>, labels can contain only alphanumeric characters\n", line_no, lbl_name);
 			return false;
         }
 	}
 
     /* Check if the label is a reserved word */
     if (is_reserved_word(lbl_name)){
-        printf("Error on line %d: Bad Label, <%s> is a reserved word\n", line_no, lbl_name);
+        printf("[x] Error on line %d: Bad Label, <%s> is a reserved word\n", line_no, lbl_name);
         return false;
     }
 
@@ -272,13 +272,13 @@ bool check_registers(char *line_ptr, int line_no){
             else{
                 val = atoi(token+1);
                 if (val == 0){
-                    printf("Error on line %d: Register %s is invalid (it should be a number between 0 and 31)\n", line_no, token);
+                    printf("[x] Error on line %d: Register %s is invalid (it should be a number between 0 and 31)\n", line_no, token);
                     return false;
                 }
             }
 
             if ( val < 0 || val > 31){
-                printf("Error on line %d: Register %s is not in range (should be between 0 and 31)\n", line_no, token);
+                printf("[x] Error on line %d: Register %s is not in range (should be between 0 and 31)\n", line_no, token);
                 return false;
             }
         }

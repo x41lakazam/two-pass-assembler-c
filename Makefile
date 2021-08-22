@@ -1,24 +1,29 @@
-main: main.o first_pass.o second_pass.o instruction.o labels.o errors.o utils.o linked_list.o
-	gcc -ansi -Wall -g -pedantic first_pass.o second_pass.o instruction.o labels.o errors.o utils.o linked_list.o -o main.o
+main: main.o first_pass.o second_pass.o instructions.o labels.o errors.o utils.o encoder.o
+	gcc -lm -ansi -Wall -g -pedantic first_pass.o second_pass.o instructions.o labels.o errors.o utils.o encoder.o main.o -o assembler
 
-second_pass.o: first_pass.c first_pass.h 
-	gcc -c -Wall -ansi -pedantic first_pass.c -o first_pass.o 
+main.o: main.c
+	gcc -c -Wall -ansi -pedantic main.c -o main.o
 
-second_pass.o: second_pass.c second_pass.h 
-	gcc -c -Wall -ansi -pedantic second_pass.c -o second_pass.o 
+first_pass.o: first_pass.c first_pass.h
+	gcc -c -Wall -ansi -pedantic first_pass.c -o first_pass.o
 
-instruction.o: instruction.c instruction.h 
-	gcc -c -Wall -ansi -pedantic instruction.c -o instruction.o 
+second_pass.o: second_pass.c second_pass.h
+	gcc -c -Wall -ansi -pedantic second_pass.c -o second_pass.o
 
-labels.o: labels.c labels.h 
-	gcc -c -Wall -ansi -pedantic labels.c -o labels.o 
+instructions.o: instructions.c instructions.h
+	gcc -c -Wall -ansi -pedantic instructions.c -o instructions.o
 
-errors.o: errors.c errors.h 
-	gcc -c -Wall -ansi -pedantic errors.c -o errors.o 
+labels.o: labels.c labels.h
+	gcc -c -Wall -ansi -pedantic labels.c -o labels.o
 
-utils.o: utils.c utils.h 
-	gcc -c -Wall -ansi -pedantic utils.c -o utils.o 
+errors.o: errors.c errors.h
+	gcc -c -Wall -ansi -pedantic errors.c -o errors.o
 
-linked_list.o: linked_list.c linked_list.h 
-	gcc -c -Wall -ansi -pedantic linked_list.c -o linked_list.o 
+utils.o: utils.c utils.h
+	gcc -c -Wall -ansi -pedantic utils.c -o utils.o
 
+encoder.o: encoder.c encoder.h
+	gcc -c -Wall -ansi -pedantic encoder.c -o encoder.o
+
+clean:
+	rm *.o

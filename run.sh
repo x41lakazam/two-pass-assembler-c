@@ -1,2 +1,2 @@
-./compile.sh
-./a.out test_file.as test_file2.as
+make
+./assembler test_file.as test_file2.as
