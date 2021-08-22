@@ -16,11 +16,11 @@
 /*
  * Boolean flags
  * has_label - True if the line contain a label
- * is_instruction - True if the line is a data instruction
+ * is_data_instruction - True if the line is a data instruction
  */
 typedef struct Flags{
     unsigned int has_label : 1;
-    unsigned int is_instruction : 1;
+    unsigned int is_data_instruction : 1;
 } Flags;
 
 
@@ -59,7 +59,7 @@ void first_pass(char *fname){
 	while ((read_cnt = get_line_wout_spaces(&line_ptr, &line_len, fp)) != -1) {
 
         /* Reinitialize flags */
-        flags.has_label = flags.is_instruction = 0;
+        flags.has_label = flags.is_data_instruction = 0;
 
         /* Clean the string */
         line_ptr = clean_str(line_ptr);
@@ -80,8 +80,8 @@ void first_pass(char *fname){
          * Calculate how many cells this data instruction will need
          * Label it if we need to
          */
-        if (is_instruction(line_ptr)){
-            flags.is_instruction = 1; /* Mark the line as data instruction */
+        if (is_data_instruction(line_ptr)){
+            flags.is_data_instruction = 1; /* Mark the line as data instruction */
 
             /* If the line contains a label, add it to the labels table */
             if (flags.has_label){

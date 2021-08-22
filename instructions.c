@@ -73,7 +73,7 @@ int instructions_cnt = 4;
 /*
  * Return True if a string is a valid instruction
  */
-bool is_instruction(char *s){
+bool is_data_instruction(char *s){
     int i;
     /*
      * Not an instruction if it doesn't start
@@ -263,7 +263,7 @@ int get_function_id(char *cmd_name){
 
 bool is_code_instruction(char *line_ptr){
 	if (relevant_line(line_ptr) &&
-		!is_instruction(line_ptr) &&
+		!is_data_instruction(line_ptr) &&
 		!is_entry_instruction(line_ptr) &&
 		!is_external_instruction(line_ptr)
 	   )

@@ -21,7 +21,7 @@ typedef enum {
  * Return:
  * True if a line is a data instruction line else false
  */
-bool is_instruction(char *line_ptr);
+bool is_data_instruction(char *line_ptr);
 
 /*
  * Return the name of the instruction in a line

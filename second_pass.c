@@ -99,7 +99,7 @@ void second_pass(char *fname, LabelsTable *labels_table_ptr, int ic_size, int dc
         }
 
         /* If it's a data instruction, add the data to the memory */
-        if (is_instruction(line_ptr)){
+        if (is_data_instruction(line_ptr)){
             tmp_dump_data_instruction(line_ptr);
             continue;
         }
