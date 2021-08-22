@@ -1,3 +1,6 @@
+/*
+ * Labels creator and handlers
+ */
 #include <stdlib.h>
 #include <ctype.h>
 #include "errors.h"

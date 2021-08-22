@@ -1,5 +1,8 @@
 /*
- * Instructions related functions
+ * Instructions related functions (parsers, checkers..)
+ * - Parse instructions out of a string
+ * - Check if an instruction is of a certain type
+ * - Retrieve additional information out of instructions (for example: opcode)
  */
 
 #include <stdbool.h>
